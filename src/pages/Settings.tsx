@@ -1,28 +1,102 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Button } from "@/components/ui/button";
-import { Clock, Mail, Shield, Save, Check } from "lucide-react";
-import { toast } from "@/hooks/use-toast";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Clock, Mail, Shield, Save, Check, Loader2 } from "lucide-react";
+import { useToast } from "@/hooks/use-toast";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
 
 export function Settings() {
   const [dailyTime, setDailyTime] = useState("08:00");
   const [topCount, setTopCount] = useState(5);
   const [isSaving, setIsSaving] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
+  const { toast } = useToast();
+  const { user } = useAuth();
+
+  // Load user settings on mount
+  useEffect(() => {
+    if (user) {
+      loadUserSettings();
+    }
+  }, [user]);
+
+  const loadUserSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('users')
+        .select('prefs_check_time, prefs_top_n')
+        .eq('id', user?.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading settings:', error);
+        toast({
+          title: "Error",
+          description: "Failed to load your settings.",
+          variant: "destructive",
+        });
+      } else if (data) {
+        setDailyTime(data.prefs_check_time || "08:00");
+        setTopCount(data.prefs_top_n || 5);
+      }
+    } catch (error) {
+      console.error('Error loading settings:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const handleSave = async () => {
+    if (!user) return;
+
     setIsSaving(true);
     
-    // Simulate save
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    
-    setIsSaving(false);
-    setLastSaved(new Date());
-    
-    toast({
-      title: "Settings saved",
-      description: "Your preferences have been updated successfully.",
-    });
+    try {
+      const { error } = await supabase.functions.invoke('settings-save', {
+        body: {
+          prefs_check_time: dailyTime,
+          prefs_top_n: topCount
+        }
+      });
+
+      if (error) {
+        throw error;
+      }
+
+      setLastSaved(new Date());
+      toast({
+        title: "Settings saved",
+        description: "Your preferences have been updated successfully.",
+      });
+    } catch (error: any) {
+      console.error('Error saving settings:', error);
+      toast({
+        title: "Error",
+        description: error.message || "Failed to save settings. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSaving(false);
+    }
   };
+
+  if (isLoading) {
+    return (
+      <div className="max-w-2xl space-y-8">
+        <div className="bg-card border border-border-subtle rounded-lg p-6">
+          <div className="animate-pulse space-y-4">
+            <div className="h-4 bg-muted rounded w-1/4"></div>
+            <div className="h-4 bg-muted rounded w-3/4"></div>
+            <div className="h-10 bg-muted rounded"></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="max-w-2xl space-y-8">
@@ -42,43 +116,43 @@ export function Settings() {
 
         <div className="space-y-6">
           {/* Daily Check Time */}
-          <div>
-            <label className="block text-body font-medium text-foreground mb-2">
+          <div className="space-y-2">
+            <Label htmlFor="daily-time" className="text-body font-medium text-foreground">
               Daily check time
-            </label>
+            </Label>
             <div className="flex items-center gap-3">
               <Clock className="w-4 h-4 text-foreground-muted" />
-              <input
+              <Input
+                id="daily-time"
                 type="time"
                 value={dailyTime}
                 onChange={(e) => setDailyTime(e.target.value)}
-                className="px-3 py-2 bg-input border border-border-subtle rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+                className="w-40"
               />
             </div>
-            <p className="text-body-sm text-foreground-muted mt-1">
+            <p className="text-body-sm text-foreground-muted">
               InBoxt will scan your emails at this time every day
             </p>
           </div>
 
           {/* Top N Emails */}
-          <div>
-            <label className="block text-body font-medium text-foreground mb-2">
+          <div className="space-y-2">
+            <Label htmlFor="top-count" className="text-body font-medium text-foreground">
               Number of top emails to show
-            </label>
-            <div className="flex items-center gap-3">
-              <select
-                value={topCount}
-                onChange={(e) => setTopCount(Number(e.target.value))}
-                className="px-3 py-2 bg-input border border-border-subtle rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
-              >
+            </Label>
+            <Select value={topCount.toString()} onValueChange={(value) => setTopCount(Number(value))}>
+              <SelectTrigger className="w-48">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
                 {Array.from({ length: 10 }, (_, i) => i + 1).map(num => (
-                  <option key={num} value={num}>
+                  <SelectItem key={num} value={num.toString()}>
                     {num} email{num !== 1 ? 's' : ''}
-                  </option>
+                  </SelectItem>
                 ))}
-              </select>
-            </div>
-            <p className="text-body-sm text-foreground-muted mt-1">
+              </SelectContent>
+            </Select>
+            <p className="text-body-sm text-foreground-muted">
               Only the most important emails will be shown in your daily digest
             </p>
           </div>
@@ -144,7 +218,7 @@ export function Settings() {
           >
             {isSaving ? (
               <>
-                <div className="w-4 h-4 border-2 border-primary-foreground/30 border-t-primary-foreground rounded-full animate-spin mr-2" />
+                <Loader2 className="w-4 h-4 animate-spin mr-2" />
                 Saving...
               </>
             ) : (

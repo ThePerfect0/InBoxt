@@ -1,1 +1,10 @@
 project_id = "ivasmxvigcojbefxbzfk"
+
+[functions.run-daily-digest]
+verify_jwt = false
+
+[functions.settings-save]
+verify_jwt = true
+
+[functions.task-operations]
+verify_jwt = true

@@ -1,7 +1,8 @@
 import { useState } from "react";
-import { RefreshCw, Search, Menu, User, LogOut } from "lucide-react";
+import { RefreshCw, Search, Menu, User, LogOut, Settings } from "lucide-react";
 import { Button } from "./ui/button";
-import { Avatar } from "./ui/avatar";
+import { Input } from "./ui/input";
+import { Avatar, AvatarFallback } from "./ui/avatar";
 import { 
   DropdownMenu,
   DropdownMenuContent,
@@ -9,6 +10,8 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
+import { useAuth } from "@/hooks/useAuth";
 
 interface TopBarProps {
   title: string;
@@ -19,12 +22,26 @@ interface TopBarProps {
 export function TopBar({ title, onMenuClick, showMenuButton = false }: TopBarProps) {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
+  const { user, signOut } = useAuth();
 
   const handleRefresh = async () => {
     setIsRefreshing(true);
     // Simulate refresh
     await new Promise(resolve => setTimeout(resolve, 1000));
     setIsRefreshing(false);
+  };
+
+  const handleSignOut = async () => {
+    await signOut();
+    navigate('/');
+  };
+
+  const getUserInitials = () => {
+    if (user?.email) {
+      return user.email.slice(0, 2).toUpperCase();
+    }
+    return 'U';
   };
 
   return (
@@ -45,14 +62,13 @@ export function TopBar({ title, onMenuClick, showMenuButton = false }: TopBarPro
       </div>
       
       {/* Search Bar */}
-      <div className="flex-1 max-w-md mx-4 relative">
+      <div className="flex-1 max-w-md mx-4 relative hidden sm:block">
         <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-foreground-muted" />
-        <input
-          type="text"
+        <Input
           placeholder="Search emails or tasks..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full pl-10 pr-4 py-2 bg-input border border-border-subtle rounded-lg text-sm text-foreground placeholder-foreground-muted focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent"
+          className="pl-10 bg-input border-border-subtle"
         />
       </div>
       
@@ -85,19 +101,21 @@ export function TopBar({ title, onMenuClick, showMenuButton = false }: TopBarPro
           <DropdownMenuTrigger asChild>
             <Button variant="ghost" size="icon" className="focus-ring">
               <Avatar className="h-8 w-8">
-                <div className="bg-primary text-primary-foreground text-sm font-medium flex items-center justify-center w-full h-full">
-                  JD
-                </div>
+                <AvatarFallback>{getUserInitials()}</AvatarFallback>
               </Avatar>
             </Button>
           </DropdownMenuTrigger>
           <DropdownMenuContent align="end" className="w-48">
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')}>
               <User className="mr-2 h-4 w-4" />
               Profile
             </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => navigate('/settings')}>
+              <Settings className="mr-2 h-4 w-4" />
+              Settings
+            </DropdownMenuItem>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className="text-danger">
+            <DropdownMenuItem onClick={handleSignOut} className="text-danger">
               <LogOut className="mr-2 h-4 w-4" />
               Sign Out
             </DropdownMenuItem>
