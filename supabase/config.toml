@@ -8,3 +8,6 @@ verify_jwt = true
 
 [functions.task-operations]
 verify_jwt = true
+
+[functions.initial-fetch]
+verify_jwt = true

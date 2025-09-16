@@ -1,5 +1,7 @@
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
+import { fetchGmailEmails, refreshGmailToken } from '../shared/gmail.ts';
+import { extractGist, calculateImportance, extractDeadline } from '../shared/openrouter.ts';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -127,8 +129,8 @@ async function processUserDigest(supabase: any, user: User) {
     return { emailsProcessed: 0, message: 'Digest already exists for today' };
   }
 
-  // Get Gmail access token for user (if available)
-  const gmailEmails = await fetchGmailEmails(user);
+  // Get Gmail emails for user
+  const gmailEmails = await fetchUserGmailEmails(supabase, user);
   
   if (gmailEmails.length === 0) {
     console.log(`No Gmail access or emails found for ${user.email}`);
@@ -142,18 +144,60 @@ async function processUserDigest(supabase: any, user: User) {
     return { emailsProcessed: 0, message: 'No emails found or Gmail not connected' };
   }
 
-  // Process and rank emails (placeholder - AI ranking will be added later)
-  const processedEmails = gmailEmails
-    .slice(0, user.prefs_top_n)
-    .map((email, index) => ({
-      email_id: email.id,
-      gist: email.snippet || 'Email content preview', // Placeholder gist
-      sender: email.sender,
-      subject: email.subject,
-      link: `https://mail.google.com/mail/u/0/#inbox/${email.id}`,
-      importance_score: Math.random(), // Placeholder importance score
-      processed_at: new Date().toISOString()
-    }));
+  // Process emails with AI
+  console.log(`Processing ${gmailEmails.length} emails with AI for ${user.email}`);
+  const processedEmails = [];
+  
+  for (const email of gmailEmails) {
+    try {
+      console.log(`Processing email ${email.id} from ${email.sender}`);
+      
+      // Extract gist
+      const gistResult = await extractGist(email.text);
+      const gist = gistResult?.gist || email.snippet || 'Unable to summarize';
+      
+      // Calculate importance
+      const importanceResult = await calculateImportance(email.text, email.sender, email.subject);
+      const importance = importanceResult?.importance || 0.5;
+      
+      // Extract deadline
+      const deadlineResult = await extractDeadline(email.text, email.subject);
+      const deadline = deadlineResult?.deadline;
+      
+      processedEmails.push({
+        email_id: email.id,
+        gist,
+        sender: email.sender,
+        subject: email.subject,
+        link: `https://mail.google.com/mail/u/0/#inbox/${email.id}`,
+        importance_score: importance,
+        deadline: deadline,
+        processed_at: new Date().toISOString()
+      });
+      
+      console.log(`Processed email ${email.id} - importance: ${importance}, deadline: ${deadline}`);
+      
+    } catch (error) {
+      console.error(`Error processing email ${email.id}:`, error);
+      
+      // Fallback processing
+      processedEmails.push({
+        email_id: email.id,
+        gist: email.snippet || 'Unable to process',
+        sender: email.sender,
+        subject: email.subject,
+        link: `https://mail.google.com/mail/u/0/#inbox/${email.id}`,
+        importance_score: 0.3,
+        deadline: null,
+        processed_at: new Date().toISOString()
+      });
+    }
+  }
+  
+  // Sort by importance and take top N
+  const rankedEmails = processedEmails
+    .sort((a, b) => b.importance_score - a.importance_score)
+    .slice(0, user.prefs_top_n);
 
   // Save digest to database
   const { error: insertError } = await supabase
@@ -161,7 +205,7 @@ async function processUserDigest(supabase: any, user: User) {
     .insert({
       user_id: user.id,
       date: today,
-      emails: processedEmails
+      emails: rankedEmails
     });
 
   if (insertError) {
@@ -169,58 +213,57 @@ async function processUserDigest(supabase: any, user: User) {
     throw insertError;
   }
 
-  console.log(`Successfully processed ${processedEmails.length} emails for ${user.email}`);
+  console.log(`Successfully processed ${rankedEmails.length} emails for ${user.email}`);
   
   return { 
-    emailsProcessed: processedEmails.length, 
-    message: `Processed ${processedEmails.length} emails` 
+    emailsProcessed: rankedEmails.length, 
+    message: `Processed ${rankedEmails.length} emails with AI ranking` 
   };
 }
 
-async function fetchGmailEmails(user: User) {
-  // Placeholder implementation for Gmail API integration
-  // This will be expanded when OAuth tokens are properly stored
+async function fetchUserGmailEmails(supabase: any, user: User) {
+  console.log(`Fetching Gmail emails for ${user.email}`);
   
-  console.log(`Attempting to fetch Gmail emails for ${user.email}`);
-  
-  // For now, return mock data to test the pipeline
-  // In production, this would:
-  // 1. Get stored OAuth tokens from Supabase
-  // 2. Call Gmail API to fetch recent emails
-  // 3. Parse email headers and content
-  // 4. Return structured email data
-  
-  const mockEmails = [
-    {
-      id: 'mock_email_1',
-      sender: 'john@example.com',
-      subject: 'Project Update Required',
-      snippet: 'Hi, we need your input on the quarterly project timeline...',
-      timestamp: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString() // 2 hours ago
-    },
-    {
-      id: 'mock_email_2',
-      sender: 'sarah@company.com',
-      subject: 'Budget Review Meeting',
-      snippet: 'Please review the attached budget documents before our meeting...',
-      timestamp: new Date(Date.now() - 4 * 60 * 60 * 1000).toISOString() // 4 hours ago
-    },
-    {
-      id: 'mock_email_3',
-      sender: 'team@startup.io',
-      subject: 'Customer Feedback Summary',
-      snippet: 'This week\'s customer feedback highlights several improvement areas...',
-      timestamp: new Date(Date.now() - 6 * 60 * 60 * 1000).toISOString() // 6 hours ago
+  try {
+    // Get stored OAuth tokens from user profile
+    const { data: profile } = await supabase
+      .from('user_profiles')
+      .select('gmail_access_token, gmail_refresh_token')
+      .eq('user_id', user.id)
+      .single();
+
+    if (!profile?.gmail_refresh_token) {
+      console.log(`No Gmail tokens found for ${user.email}`);
+      return [];
     }
-  ];
 
-  // Only return mock emails in development/testing
-  if (Deno.env.get('ENVIRONMENT') !== 'production') {
-    console.log(`Returning ${mockEmails.length} mock emails for testing`);
-    return mockEmails;
+    let accessToken = profile.gmail_access_token;
+    
+    // Refresh token if needed
+    if (!accessToken) {
+      console.log('Refreshing Gmail access token...');
+      accessToken = await refreshGmailToken(profile.gmail_refresh_token);
+      
+      if (!accessToken) {
+        console.error('Failed to refresh Gmail token');
+        return [];
+      }
+
+      // Update stored access token
+      await supabase
+        .from('user_profiles')
+        .update({ gmail_access_token: accessToken })
+        .eq('user_id', user.id);
+    }
+
+    // Fetch emails from Gmail API
+    const emails = await fetchGmailEmails(accessToken);
+    console.log(`Fetched ${emails.length} emails from Gmail for ${user.email}`);
+    
+    return emails;
+    
+  } catch (error) {
+    console.error(`Error fetching Gmail emails for ${user.email}:`, error);
+    return [];
   }
-
-  // In production, would implement actual Gmail API calls here
-  console.log('Gmail integration not yet configured for production');
-  return [];
 }
