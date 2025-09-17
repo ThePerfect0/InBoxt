@@ -32,7 +32,8 @@ export function Dashboard() {
     isProcessing, 
     showConnectDialog, 
     setShowConnectDialog, 
-    handleGmailConnected 
+    handleGmailConnected,
+    digestFetchComplete
   } = useInitialFetch();
 
   useEffect(() => {
@@ -41,6 +42,7 @@ export function Dashboard() {
     const loadTodaysDigest = async () => {
       try {
         const today = new Date().toISOString().split('T')[0];
+        console.log('Loading today\'s digest for:', today);
         
         // Get today's digest
         const { data: digest } = await supabase
@@ -48,17 +50,22 @@ export function Dashboard() {
           .select('emails')
           .eq('user_id', user.id)
           .eq('date', today)
-          .single();
+          .maybeSingle();
 
         // Check if user has Gmail connection
         const { data: profile } = await supabase
           .from('user_profiles')
           .select('gmail_refresh_token')
           .eq('user_id', user.id)
-          .single();
+          .maybeSingle();
 
         setHasGmailConnection(!!profile?.gmail_refresh_token);
-        setEmails(Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : []);
+        const digestEmails = Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : [];
+        setEmails(digestEmails);
+        
+        if (digestEmails.length > 0) {
+          console.log('Dashboard rendered with data:', digestEmails.length, 'emails');
+        }
       } catch (error) {
         console.error('Error loading digest:', error);
         setEmails([]);
@@ -68,7 +75,7 @@ export function Dashboard() {
     };
 
     loadTodaysDigest();
-  }, [user]);
+  }, [user, digestFetchComplete]);
 
   const handleConnectGmail = () => {
     setShowConnectDialog(true);
@@ -79,7 +86,10 @@ export function Dashboard() {
     return (
       <InitialFetchOverlay
         show={true}
-        onComplete={() => window.location.reload()}
+        onComplete={() => {
+          // Don't reload page, just re-fetch digest data
+          console.log('Initial fetch overlay completed');
+        }}
         onError={(error) => console.error('Initial fetch error:', error)}
       />
     );

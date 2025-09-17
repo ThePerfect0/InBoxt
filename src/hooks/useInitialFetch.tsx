@@ -9,6 +9,7 @@ export function useInitialFetch() {
   const [isProcessing, setIsProcessing] = useState(false);
   const [showConnectDialog, setShowConnectDialog] = useState(false);
   const [hasProcessedOAuth, setHasProcessedOAuth] = useState(false);
+  const [digestFetchComplete, setDigestFetchComplete] = useState(false);
   const { user, session } = useAuth();
   const { toast } = useToast();
 
@@ -16,6 +17,7 @@ export function useInitialFetch() {
     if (!user || !session || hasProcessedOAuth) return;
 
     const handleOAuthSession = async () => {
+      console.log('OAuth session handler started', { provider: session.user.app_metadata.provider });
       try {
         // Check if this is an OAuth session with provider token
         const providerToken = session.provider_token;
@@ -23,6 +25,22 @@ export function useInitialFetch() {
         
         if (providerToken && session.user.app_metadata.provider === 'google') {
           console.log('OAuth session detected, storing tokens and running initial fetch');
+          
+          // Check if digest already exists for today
+          const today = new Date().toISOString().split('T')[0];
+          const { data: existingDigest } = await supabase
+            .from('digests')
+            .select('id')
+            .eq('user_id', user.id)
+            .eq('date', today)
+            .maybeSingle();
+
+          if (existingDigest) {
+            console.log('Digest already exists for today, skipping fetch');
+            setHasProcessedOAuth(true);
+            setDigestFetchComplete(true);
+            return;
+          }
           
           // Store Gmail tokens in user profile
           await supabase
@@ -34,6 +52,7 @@ export function useInitialFetch() {
             });
 
           // Run initial fetch
+          console.log('Digest fetch started');
           setIsProcessing(true);
           
           const { error } = await supabase.functions.invoke('initial-fetch', {
@@ -48,10 +67,12 @@ export function useInitialFetch() {
               variant: "destructive",
             });
           } else {
+            console.log('Digest saved to DB');
             toast({
               title: "Digest ready!",
               description: "Your first email digest has been generated.",
             });
+            setDigestFetchComplete(true);
           }
           
           setIsProcessing(false);
@@ -80,6 +101,7 @@ export function useInitialFetch() {
     setIsProcessing(true);
     
     try {
+      console.log('Gmail connected, starting digest fetch');
       const { error } = await supabase.functions.invoke('initial-fetch', {
         body: { access_token: session?.access_token }
       });
@@ -88,6 +110,8 @@ export function useInitialFetch() {
         throw error;
       }
 
+      console.log('Digest saved to DB after Gmail connection');
+      setDigestFetchComplete(true);
       toast({
         title: "Gmail connected!",
         description: "Your first email digest has been generated.",
@@ -107,6 +131,7 @@ export function useInitialFetch() {
     isProcessing,
     showConnectDialog,
     setShowConnectDialog,
-    handleGmailConnected
+    handleGmailConnected,
+    digestFetchComplete
   };
 }
