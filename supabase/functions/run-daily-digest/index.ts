@@ -194,10 +194,13 @@ async function processUserDigest(supabase: any, user: User) {
     }
   }
   
-  // Sort by importance and take top N
-  const rankedEmails = processedEmails
+  // Filter by importance threshold (0.4+) then sort and take top N
+  const filteredEmails = processedEmails.filter(email => email.importance_score >= 0.4);
+  const rankedEmails = filteredEmails
     .sort((a, b) => b.importance_score - a.importance_score)
     .slice(0, user.prefs_top_n);
+  
+  console.log(`Filtered ${processedEmails.length} emails to ${filteredEmails.length} with importance >= 0.4, taking top ${rankedEmails.length}`);
 
   // Save digest to database
   const { error: insertError } = await supabase

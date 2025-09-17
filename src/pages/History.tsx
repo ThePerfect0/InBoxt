@@ -1,161 +1,138 @@
 import { useState, useEffect } from "react";
 import { EmailCard } from "@/components/EmailCard";
-import { SectionHeader } from "@/components/SectionHeader";
 import { EmptyState } from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Button } from "@/components/ui/button";
-import { History as HistoryIcon, ChevronLeft, ChevronRight } from "lucide-react";
-import { mockHistoryEmails } from "@/lib/mockData";
+import { Calendar } from "lucide-react";
+import { useAuth } from "@/hooks/useAuth";
+import { supabase } from "@/integrations/supabase/client";
+
+interface EmailDigest {
+  email_id: string;
+  gist: string;
+  sender: string;
+  subject: string;
+  link: string;
+  importance_score: number;
+  deadline?: string;
+  processed_at: string;
+}
+
+interface DigestHistory {
+  date: string;
+  emails: EmailDigest[];
+}
 
 export function History() {
-  const [historyData, setHistoryData] = useState(mockHistoryEmails);
+  const [history, setHistory] = useState<DigestHistory[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [currentMonth, setCurrentMonth] = useState(new Date());
+  const { user } = useAuth();
 
   useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
+    if (user) {
+      loadHistory();
+    }
+  }, [user]);
+
+  const loadHistory = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('digests')
+        .select('date, emails')
+        .eq('user_id', user?.id)
+        .order('date', { ascending: false })
+        .limit(30); // Last 30 days
+
+      if (error) throw error;
+
+      const historyData: DigestHistory[] = (data || []).map(digest => ({
+        date: new Date(digest.date).toLocaleDateString('en-US', { 
+          weekday: 'long', 
+          year: 'numeric', 
+          month: 'long', 
+          day: 'numeric' 
+        }),
+        emails: Array.isArray(digest.emails) ? digest.emails as unknown as EmailDigest[] : []
+      })).filter(d => d.emails.length > 0);
+
+      setHistory(historyData);
+    } catch (error) {
+      console.error('Error loading history:', error);
+    } finally {
       setIsLoading(false);
-    }, 800);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const formatMonth = (date: Date) => {
-    return date.toLocaleDateString('en-US', {
-      month: 'long',
-      year: 'numeric',
-    });
-  };
-
-  const navigateMonth = (direction: 'prev' | 'next') => {
-    setCurrentMonth(prev => {
-      const newDate = new Date(prev);
-      if (direction === 'prev') {
-        newDate.setMonth(prev.getMonth() - 1);
-      } else {
-        newDate.setMonth(prev.getMonth() + 1);
-      }
-      return newDate;
-    });
+    }
   };
 
   if (isLoading) {
     return (
-      <div className="space-y-6">
-        {/* Month Navigator Skeleton */}
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-8 w-32" />
-          <div className="flex gap-2">
-            <Skeleton className="h-8 w-8" />
-            <Skeleton className="h-8 w-8" />
-          </div>
-        </div>
-
-        {/* Section Headers and Email Cards */}
-        {Array.from({ length: 3 }).map((_, sectionIndex) => (
-          <div key={sectionIndex} className="space-y-4">
-            <SectionHeader sticky>
-              <Skeleton className="h-5 w-40" />
-            </SectionHeader>
-            {Array.from({ length: 2 }).map((_, i) => (
-              <div key={i} className="p-4 bg-card border border-border-subtle rounded-lg">
-                <div className="flex items-start gap-3">
-                  <Skeleton className="h-10 w-10 rounded-full flex-shrink-0" />
-                  <div className="flex-1 space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Skeleton className="h-4 w-32" />
-                      <Skeleton className="h-5 w-16 rounded-full" />
-                    </div>
-                    <Skeleton className="h-4 w-full" />
-                    <Skeleton className="h-8 w-full" />
-                    <div className="flex gap-2">
-                      <Skeleton className="h-7 w-24" />
-                      <Skeleton className="h-7 w-28" />
-                    </div>
+      <div className="space-y-8">
+        {Array.from({ length: 3 }).map((_, i) => (
+          <div key={i} className="space-y-4">
+            <Skeleton className="h-6 w-48" />
+            <div className="space-y-3">
+              {Array.from({ length: 2 }).map((_, j) => (
+                <div key={j} className="bg-card border border-border-subtle rounded-lg p-6 animate-pulse">
+                  <div className="space-y-3">
+                    <div className="h-4 bg-muted rounded w-1/4"></div>
+                    <div className="h-4 bg-muted rounded w-3/4"></div>
+                    <div className="h-3 bg-muted rounded w-1/2"></div>
                   </div>
-                </div>
-              </div>
-            ))}
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  if (historyData.length === 0) {
-    return (
-      <EmptyState
-        icon={<HistoryIcon className="w-8 h-8" />}
-        title="No email history"
-        description="Your email digest history will appear here once you start receiving daily summaries."
-        action={{
-          label: "Go to Dashboard",
-          onClick: () => window.location.href = "/dashboard",
-        }}
-      />
-    );
-  }
-
-  return (
-    <div className="space-y-6">
-      {/* Month Navigator */}
-      <div className="flex items-center justify-between">
-        <h2 className="text-heading-md text-foreground">
-          {formatMonth(currentMonth)}
-        </h2>
-        <div className="flex gap-2">
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigateMonth('prev')}
-          >
-            <ChevronLeft className="h-4 w-4" />
-          </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            onClick={() => navigateMonth('next')}
-          >
-            <ChevronRight className="h-4 w-4" />
-          </Button>
-        </div>
-      </div>
-
-      {/* History Sections */}
-      <div className="space-y-6">
-        {historyData.map((section, sectionIndex) => (
-          <div key={section.date} className="space-y-4">
-            <SectionHeader 
-              sticky
-              count={section.emails.length}
-            >
-              {section.date}
-            </SectionHeader>
-            
-            <div className="space-y-4">
-              {section.emails.map((email, emailIndex) => (
-                <div 
-                  key={email.id} 
-                  className="animate-fade-in"
-                  style={{ 
-                    animationDelay: `${(sectionIndex * 3 + emailIndex) * 100}ms` 
-                  }}
-                >
-                  <EmailCard email={email} />
                 </div>
               ))}
             </div>
           </div>
         ))}
       </div>
+    );
+  }
 
-      {/* Load More */}
-      <div className="flex justify-center pt-6">
-        <Button variant="secondary">
-          Load Older
-        </Button>
-      </div>
+  if (history.length === 0) {
+    return (
+      <EmptyState
+        icon={<Calendar className="w-8 h-8" />}
+        title="No digest history"
+        description="Your email digests will appear here after they are processed. Check back tomorrow for your first digest."
+      />
+    );
+  }
+
+  return (
+    <div className="space-y-8">
+      {history.map((digest, index) => (
+        <div key={digest.date} className="space-y-4">
+          <div className="flex items-center gap-3">
+            <Calendar className="w-5 h-5 text-foreground-muted" />
+            <h2 className="text-heading-sm text-foreground">{digest.date}</h2>
+            <span className="text-body-sm text-foreground-muted">
+              {digest.emails.length} email{digest.emails.length !== 1 ? 's' : ''}
+            </span>
+          </div>
+          
+          <div className="space-y-4">
+            {digest.emails.map((email) => (
+              <div 
+                key={email.email_id} 
+                className="animate-fade-in"
+                style={{ animationDelay: `${index * 100}ms` }}
+              >
+                <EmailCard
+                  email={{
+                    id: email.email_id,
+                    from: {
+                      name: email.sender,
+                      email: email.sender
+                    },
+                    subject: email.subject,
+                    gist: email.gist,
+                    emailUrl: email.link,
+                    importance: email.importance_score,
+                    timestamp: new Date(email.processed_at)
+                  }}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      ))}
     </div>
   );
 }

@@ -1,57 +1,23 @@
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { TaskRow } from "@/components/TaskRow";
 import { EmptyState } from "@/components/EmptyState";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { CheckSquare, Plus } from "lucide-react";
-import { mockTasks } from "@/lib/mockData";
-import type { Task } from "@/components/TaskRow";
+import { CheckSquare } from "lucide-react";
+import { useTasks } from "@/hooks/useTasks";
 
 export function Tasks() {
-  const [tasks, setTasks] = useState(mockTasks);
-  const [isLoading, setIsLoading] = useState(true);
+  const { 
+    pendingTasks, 
+    completedTasks, 
+    isLoading, 
+    toggleComplete, 
+    deleteTask, 
+    updateDeadline 
+  } = useTasks();
   const [activeTab, setActiveTab] = useState("pending");
 
-  useEffect(() => {
-    // Simulate loading
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 600);
-
-    return () => clearTimeout(timer);
-  }, []);
-
-  const pendingTasks = tasks
-    .filter(task => !task.completed)
-    .sort((a, b) => a.deadline.getTime() - b.deadline.getTime());
-
-  const completedTasks = tasks
-    .filter(task => task.completed)
-    .sort((a, b) => (b.completedAt?.getTime() || 0) - (a.completedAt?.getTime() || 0));
-
-  const handleToggleComplete = (id: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === id 
-        ? { 
-            ...task, 
-            completed: !task.completed,
-            completedAt: !task.completed ? new Date() : undefined
-          }
-        : task
-    ));
-  };
-
-  const handleDelete = (id: string) => {
-    setTasks(prev => prev.filter(task => task.id !== id));
-  };
-
-  const handleUpdateDeadline = (id: string, deadline: Date) => {
-    setTasks(prev => prev.map(task => 
-      task.id === id ? { ...task, deadline } : task
-    ));
-  };
-
-  const renderTaskList = (taskList: Task[]) => {
+  const renderTaskList = (taskList: any[]) => {
     if (isLoading) {
       return (
         <div className="space-y-4">
@@ -107,10 +73,16 @@ export function Tasks() {
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <TaskRow
-              task={task}
-              onToggleComplete={handleToggleComplete}
-              onDelete={handleDelete}
-              onUpdateDeadline={handleUpdateDeadline}
+              task={{
+                ...task,
+                completed: task.status === 'completed',
+                completedAt: task.completedAt,
+                gist: task.description || '',
+                emailUrl: task.email_link || ''
+              }}
+              onToggleComplete={toggleComplete}
+              onDelete={deleteTask}
+              onUpdateDeadline={updateDeadline}
             />
           </div>
         ))}

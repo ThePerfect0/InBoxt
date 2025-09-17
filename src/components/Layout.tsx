@@ -60,6 +60,12 @@ export function Layout() {
         <main className="flex-1 p-4 md:p-6 overflow-auto">
           <Outlet />
         </main>
+        
+        <footer className="border-t border-border-subtle p-4 text-center">
+          <p className="text-body-sm text-foreground-muted">
+            © 2025 InBoxt. All rights reserved.
+          </p>
+        </footer>
       </div>
     </div>
   );

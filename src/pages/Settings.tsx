@@ -153,7 +153,24 @@ export function Settings() {
               </SelectContent>
             </Select>
             <p className="text-body-sm text-foreground-muted">
-              Only the most important emails will be shown in your daily digest
+              Only emails with importance ≥ 0.4 that meet this count will be shown
+            </p>
+          </div>
+
+          {/* Importance Threshold */}
+          <div className="space-y-2">
+            <Label className="text-body font-medium text-foreground">
+              Importance threshold
+            </Label>
+            <div className="flex items-center gap-3">
+              <span className="text-body-sm text-foreground-muted">Low (0.4)</span>
+              <div className="flex-1 bg-muted rounded-full h-2">
+                <div className="bg-primary rounded-full h-2 w-2/5"></div>
+              </div>
+              <span className="text-body-sm text-foreground-muted">High (1.0)</span>
+            </div>
+            <p className="text-body-sm text-foreground-muted">
+              Currently set to 0.4 - only emails above this importance score will appear in your digest
             </p>
           </div>
         </div>

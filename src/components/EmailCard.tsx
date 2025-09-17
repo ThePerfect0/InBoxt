@@ -3,6 +3,7 @@ import { Button } from "./ui/button";
 import { Chip } from "./ui/chip";
 import { Avatar } from "./ui/avatar";
 import { toast } from "@/hooks/use-toast";
+import { supabase } from "@/integrations/supabase/client";
 
 export interface Email {
   id: string;
@@ -49,11 +50,32 @@ export function EmailCard({ email }: EmailCardProps) {
     return `${diffInDays}d ago`;
   };
 
-  const handleSaveToTasks = () => {
-    toast({
-      title: "Added to tasks",
-      description: `"${email.subject}" has been saved to your tasks.`,
-    });
+  const handleSaveToTasks = async () => {
+    try {
+      const { data, error } = await supabase.functions.invoke('task-operations', {
+        body: {
+          action: 'create',
+          title: email.subject,
+          description: email.gist,
+          email_link: email.emailUrl,
+          created_from_digest_date: new Date().toISOString().split('T')[0]
+        }
+      });
+
+      if (error) throw error;
+
+      toast({
+        title: "Added to tasks",
+        description: `"${email.subject}" has been saved to your tasks.`,
+      });
+    } catch (error) {
+      console.error('Error saving to tasks:', error);
+      toast({
+        title: "Error",
+        description: "Failed to save email to tasks. Please try again.",
+        variant: "destructive",
+      });
+    }
   };
 
   const getInitials = (name: string) => {
@@ -66,7 +88,7 @@ export function EmailCard({ email }: EmailCardProps) {
   };
 
   return (
-    <div className="p-4 bg-card border border-border-subtle rounded-lg hover:bg-card-hover transition-all duration-150 group">
+    <div className="p-4 bg-card border border-border-subtle rounded-lg card-interactive group" role="article" aria-label={`Email from ${email.from.name}: ${email.subject}`}>
       <div className="flex items-start gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
@@ -116,7 +138,8 @@ export function EmailCard({ email }: EmailCardProps) {
               variant="secondary"
               size="sm"
               onClick={() => window.open(email.emailUrl, '_blank')}
-              className="text-xs"
+              className="text-xs interactive"
+              aria-label={`Open email "${email.subject}" in Gmail`}
             >
               <ExternalLink className="h-3 w-3 mr-1.5" />
               Open Email
@@ -125,7 +148,8 @@ export function EmailCard({ email }: EmailCardProps) {
             <Button
               size="sm"
               onClick={handleSaveToTasks}
-              className="text-xs"
+              className="text-xs interactive"
+              aria-label={`Save email "${email.subject}" to tasks`}
             >
               <Plus className="h-3 w-3 mr-1.5" />
               Save to Tasks

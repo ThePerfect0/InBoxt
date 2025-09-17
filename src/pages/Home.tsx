@@ -20,23 +20,18 @@ import {
 const FEATURES = [
   {
     icon: <Clock className="w-6 h-6" />,
-    title: "Daily digest at your time",
-    description: "Set your preferred time to receive a curated daily email summary."
+    title: "AI-powered email filtering",
+    description: "Only emails with importance score ≥ 0.4 appear in your digest. Smart filtering that learns what matters."
   },
   {
     icon: <Target className="w-6 h-6" />,
-    title: "Top N priorities only",
-    description: "Choose how many important emails to see (3-10). No more overwhelming inbox."
+    title: "Configurable daily limits",
+    description: "Choose how many important emails to see (1-10). Focus on what truly needs your attention."
   },
   {
     icon: <CheckSquare className="w-6 h-6" />,
-    title: "Save to tasks with deadlines",
-    description: "Convert important emails into actionable tasks with AI-inferred deadlines."
-  },
-  {
-    icon: <Search className="w-6 h-6" />,
-    title: "Search past gists",
-    description: "Ask natural language questions to find emails and tasks from your history."
+    title: "Save emails as tasks",
+    description: "Convert important emails into actionable tasks with one click. Manage deadlines efficiently."
   },
   {
     icon: <Shield className="w-6 h-6" />,
@@ -48,20 +43,20 @@ const FEATURES = [
 const HOW_IT_WORKS = [
   {
     step: 1,
-    title: "Connect your email",
-    description: "Securely link Gmail, Outlook, or any IMAP email account",
+    title: "Connect Gmail",
+    description: "Securely connect your Gmail account with OAuth authentication",
     icon: <Mail className="w-8 h-8" />
   },
   {
     step: 2,
-    title: "Set your preferences",
-    description: "Choose your daily digest time and number of priority emails",
-    icon: <Clock className="w-8 h-8" />
+    title: "AI analyzes emails",
+    description: "Our AI processes and scores emails by importance (threshold ≥ 0.4)",
+    icon: <Zap className="w-8 h-8" />
   },
   {
     step: 3,
-    title: "Review and save tasks",
-    description: "Get AI-summarized emails and save important ones as tasks",
+    title: "Daily digest & tasks",
+    description: "Review your important emails and save them as actionable tasks",
     icon: <CheckSquare className="w-8 h-8" />
   }
 ];
@@ -77,11 +72,11 @@ const FAQ_ITEMS = [
   },
   {
     question: "Which email providers are supported?",
-    answer: "We support Gmail, Outlook, Yahoo, and any email provider with IMAP access. Google and Apple OAuth make setup seamless for most users."
+    answer: "Currently we support Gmail with OAuth authentication. Outlook and other providers are coming soon."
   },
   {
     question: "Can I customize my digest preferences?",
-    answer: "Absolutely. You can set your preferred digest time, choose how many emails to see (1-10), and adjust importance thresholds in your settings."
+    answer: "Yes. You can set your daily check time and choose how many emails to see (1-10). All emails must meet our 0.4 importance threshold."
   }
 ];
 

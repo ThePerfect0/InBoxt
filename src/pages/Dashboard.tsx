@@ -61,7 +61,9 @@ export function Dashboard() {
 
         setHasGmailConnection(!!profile?.gmail_refresh_token);
         const digestEmails = Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : [];
-        setEmails(digestEmails);
+        // Filter emails by importance threshold on client side as well
+        const filteredEmails = digestEmails.filter(email => email.importance_score >= 0.4);
+        setEmails(filteredEmails);
         
         if (digestEmails.length > 0) {
           console.log('Dashboard rendered with data:', digestEmails.length, 'emails');
@@ -179,8 +181,8 @@ export function Dashboard() {
         </div>
         <EmptyState
           icon={<Mail className="w-8 h-8" />}
-          title="No important emails today"
-          description="You're all caught up! We'll check for new emails and update your digest throughout the day."
+          title="Your inbox is quiet today"
+          description="No emails meet our importance threshold (score ≥ 0.4). Check back later or adjust your settings if you'd like to see more emails."
         />
       </div>
     );
