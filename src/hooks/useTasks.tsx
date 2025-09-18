@@ -22,19 +22,35 @@ export function useTasks() {
 
   useEffect(() => {
     if (user) {
+      console.log('Loading tasks for user:', user.id);
       loadTasks();
+    } else {
+      console.log('No user found, not loading tasks');
+      setIsLoading(false);
     }
   }, [user]);
 
   const loadTasks = async () => {
+    if (!user?.id) {
+      console.log('No user ID available for loading tasks');
+      setIsLoading(false);
+      return;
+    }
+
     try {
+      console.log('Loading tasks for user ID:', user.id);
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
-        .eq('user_id', user?.id)
+        .eq('user_id', user.id)
         .order('created_at', { ascending: false });
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error loading tasks:', error);
+        throw error;
+      }
+
+      console.log('Raw tasks data from database:', data);
 
       const mappedTasks: Task[] = (data || []).map(task => ({
         id: task.id,
@@ -48,6 +64,7 @@ export function useTasks() {
         completedAt: task.status === 'completed' ? new Date(task.updated_at) : undefined,
       }));
 
+      console.log('Mapped tasks:', mappedTasks);
       setTasks(mappedTasks);
     } catch (error) {
       console.error('Error loading tasks:', error);

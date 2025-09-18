@@ -31,10 +31,33 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
+      async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
+        
+        // Handle OAuth token storage
+        if (event === 'SIGNED_IN' && session?.provider_token) {
+          console.log('Storing OAuth tokens for user:', session.user.id);
+          try {
+            const { error } = await supabase
+              .from('user_profiles')
+              .upsert({
+                user_id: session.user.id,
+                gmail_access_token: session.provider_token,
+                gmail_refresh_token: session.provider_refresh_token,
+              });
+            
+            if (error) {
+              console.error('Error storing OAuth tokens:', error);
+            } else {
+              console.log('OAuth tokens stored successfully');
+            }
+          } catch (err) {
+            console.error('Failed to store OAuth tokens:', err);
+          }
+        }
       }
     );
 
