@@ -16,7 +16,7 @@ export interface Task {
   title: string;
   gist: string;
   emailUrl: string;
-  deadline: Date;
+  deadline?: Date;
   completed: boolean;
   completedAt?: Date;
 }
@@ -31,8 +31,9 @@ interface TaskRowProps {
 export function TaskRow({ task, onToggleComplete, onDelete, onUpdateDeadline }: TaskRowProps) {
   const [isEditing, setIsEditing] = useState(false);
 
-  const getDeadlineVariant = (deadline: Date, completed: boolean) => {
+  const getDeadlineVariant = (deadline: Date | undefined, completed: boolean) => {
     if (completed) return "success";
+    if (!deadline) return "default";
     
     const now = new Date();
     const diffInHours = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60);
@@ -42,8 +43,9 @@ export function TaskRow({ task, onToggleComplete, onDelete, onUpdateDeadline }: 
     return "scheduled";
   };
 
-  const getDeadlineLabel = (deadline: Date, completed: boolean) => {
+  const getDeadlineLabel = (deadline: Date | undefined, completed: boolean) => {
     if (completed) return "Completed";
+    if (!deadline) return "No deadline";
     
     const now = new Date();
     const diffInHours = (deadline.getTime() - now.getTime()) / (1000 * 60 * 60);
@@ -60,7 +62,8 @@ export function TaskRow({ task, onToggleComplete, onDelete, onUpdateDeadline }: 
     return `Due in ${diffInDays}d`;
   };
 
-  const formatDate = (date: Date) => {
+  const formatDate = (date: Date | undefined) => {
+    if (!date) return "No deadline";
     return date.toLocaleDateString('en-US', {
       month: 'short',
       day: 'numeric',
@@ -141,10 +144,12 @@ export function TaskRow({ task, onToggleComplete, onDelete, onUpdateDeadline }: 
                 View Email
               </Button>
               
-              <div className="flex items-center gap-1 text-caption">
-                <Calendar className="h-3 w-3" />
-                {formatDate(task.deadline)}
-              </div>
+              {task.deadline && (
+                <div className="flex items-center gap-1 text-caption">
+                  <Calendar className="h-3 w-3" />
+                  {formatDate(task.deadline)}
+                </div>
+              )}
             </div>
 
             <DropdownMenu>
