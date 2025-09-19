@@ -32,37 +32,30 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
+        console.log('Auth state change:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Handle OAuth token storage and user profile creation
-        if (event === 'SIGNED_IN' && session?.user) {
-          
+        // Handle OAuth token storage
+        if (event === 'SIGNED_IN' && session?.provider_token) {
+          console.log('Storing OAuth tokens for user:', session.user.id);
           try {
-            // Ensure user profile exists
-            const { error: profileError } = await supabase
+            const { error } = await supabase
               .from('user_profiles')
               .upsert({
                 user_id: session.user.id,
-              }, {
-                onConflict: 'user_id'
+                gmail_access_token: session.provider_token,
+                gmail_refresh_token: session.provider_refresh_token,
               });
-
-            // Store OAuth tokens if available
-            if (session.provider_token) {
-              await supabase
-                .from('user_profiles')
-                .upsert({
-                  user_id: session.user.id,
-                  gmail_access_token: session.provider_token,
-                  gmail_refresh_token: session.provider_refresh_token || null,
-                }, {
-                  onConflict: 'user_id'
-                });
+            
+            if (error) {
+              console.error('Error storing OAuth tokens:', error);
+            } else {
+              console.log('OAuth tokens stored successfully');
             }
           } catch (err) {
-            // Silently handle errors in production
+            console.error('Failed to store OAuth tokens:', err);
           }
         }
       }
