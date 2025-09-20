@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -20,25 +20,13 @@ export function useTasks() {
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
 
-  useEffect(() => {
-    if (user) {
-      console.log('Loading tasks for user:', user.id);
-      loadTasks();
-    } else {
-      console.log('No user found, not loading tasks');
-      setIsLoading(false);
-    }
-  }, [user]);
-
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     if (!user?.id) {
-      console.log('No user ID available for loading tasks');
       setIsLoading(false);
       return;
     }
 
     try {
-      console.log('Loading tasks for user ID:', user.id);
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -46,11 +34,8 @@ export function useTasks() {
         .order('created_at', { ascending: false });
 
       if (error) {
-        console.error('Supabase error loading tasks:', error);
         throw error;
       }
-
-      console.log('Raw tasks data from database:', data);
 
       const mappedTasks: Task[] = (data || []).map(task => ({
         id: task.id,
@@ -64,10 +49,8 @@ export function useTasks() {
         completedAt: task.status === 'completed' ? new Date(task.updated_at) : undefined,
       }));
 
-      console.log('Mapped tasks:', mappedTasks);
       setTasks(mappedTasks);
     } catch (error) {
-      console.error('Error loading tasks:', error);
       toast({
         title: "Error",
         description: "Failed to load tasks.",
@@ -76,24 +59,54 @@ export function useTasks() {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [user?.id]);
 
-  const toggleComplete = async (id: string) => {
+  useEffect(() => {
+    if (user) {
+      loadTasks();
+    } else {
+      setIsLoading(false);
+    }
+  }, [user, loadTasks]);
+
+  const toggleComplete = useCallback(async (id: string) => {
     try {
       const task = tasks.find(t => t.id === id);
-      if (!task) return;
+      if (!task) {
+        return;
+      }
 
       const newStatus = task.status === 'completed' ? 'pending' : 'completed';
 
-      const { error } = await supabase.functions.invoke('task-operations', {
-        body: {
-          action: 'update',
-          id,
-          status: newStatus
-        }
-      });
+      // Try direct database update first, fallback to edge function
+      let updateError = null;
+      
+      try {
+        const { error: dbError } = await supabase
+          .from('tasks')
+          .update({ 
+            status: newStatus,
+            updated_at: new Date().toISOString()
+          })
+          .eq('id', id)
+          .eq('user_id', user?.id);
 
-      if (error) throw error;
+        updateError = dbError;
+      } catch (dbErr) {
+        const { error: funcError } = await supabase.functions.invoke('task-operations', {
+          body: {
+            action: 'update',
+            id,
+            status: newStatus
+          }
+        });
+        
+        updateError = funcError;
+      }
+
+      if (updateError) {
+        throw updateError;
+      }
 
       // Update local state
       setTasks(prev => prev.map(t => 
@@ -101,6 +114,7 @@ export function useTasks() {
           ? { 
               ...t, 
               status: newStatus,
+              updated_at: new Date(),
               completedAt: newStatus === 'completed' ? new Date() : undefined
             }
           : t
@@ -111,14 +125,13 @@ export function useTasks() {
         description: `"${task.title}" has been ${newStatus === 'completed' ? 'marked as complete' : 'reopened'}.`,
       });
     } catch (error) {
-      console.error('Error toggling task:', error);
       toast({
         title: "Error",
-        description: "Failed to update task.",
+        description: "Failed to update task. Please try again.",
         variant: "destructive",
       });
     }
-  };
+  }, [tasks, user?.id]);
 
   const deleteTask = async (id: string) => {
     try {
