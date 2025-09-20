@@ -35,12 +35,18 @@ export function History() {
 
   const loadHistory = async () => {
     try {
+      // Load digests from the last 6 months
+      const sixMonthsAgo = new Date();
+      sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
+      const sixMonthsAgoStr = sixMonthsAgo.toISOString().split('T')[0];
+
       const { data, error } = await supabase
         .from('digests')
         .select('date, emails')
         .eq('user_id', user?.id)
+        .gte('date', sixMonthsAgoStr)
         .order('date', { ascending: false })
-        .limit(30); // Last 30 days
+        .limit(180); // Up to ~6 months
 
       if (error) throw error;
 

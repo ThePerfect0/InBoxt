@@ -30,7 +30,7 @@ export function Dashboard() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasGmailConnection, setHasGmailConnection] = useState(false);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
-  const { user } = useAuth();
+  const { user, session } = useAuth();
   const { toast } = useToast();
   const { 
     isProcessing, 
@@ -91,9 +91,20 @@ export function Dashboard() {
   const handleRefresh = async () => {
     setIsRefreshing(true);
     try {
+      // Ensure we have a session access token
+      if (!session?.access_token) {
+        console.warn('No session access token found for refresh');
+        toast({
+          title: "Not signed in",
+          description: "Please sign in again to refresh your digest.",
+          variant: "destructive",
+        });
+        return;
+      }
+
       // Call initial fetch function to refresh data
       const { error } = await supabase.functions.invoke('initial-fetch', {
-        body: {}
+        body: { access_token: session.access_token }
       });
       
       if (error) throw error;
