@@ -9,9 +9,8 @@ import { ConnectEmailDialog } from "@/components/ConnectEmailDialog";
 import { supabase } from "@/integrations/supabase/client";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Mail, Settings, RefreshCw, Clock } from "lucide-react";
+import { Mail, Settings } from "lucide-react";
 import { Link } from "react-router-dom";
-import { useToast } from "@/hooks/use-toast";
 
 interface EmailDigest {
   email_id: string;
@@ -27,11 +26,8 @@ interface EmailDigest {
 export function Dashboard() {
   const [emails, setEmails] = useState<EmailDigest[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const [isRefreshing, setIsRefreshing] = useState(false);
   const [hasGmailConnection, setHasGmailConnection] = useState(false);
-  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const { user } = useAuth();
-  const { toast } = useToast();
   const { 
     isProcessing, 
     showConnectDialog, 
@@ -68,7 +64,6 @@ export function Dashboard() {
         // Filter emails by importance threshold on client side as well
         const filteredEmails = digestEmails.filter(email => email.importance_score >= 0.4);
         setEmails(filteredEmails);
-        setLastUpdated(new Date());
         
         if (digestEmails.length > 0) {
           console.log('Dashboard rendered with data:', digestEmails.length, 'emails');
@@ -86,68 +81,6 @@ export function Dashboard() {
 
   const handleConnectGmail = () => {
     setShowConnectDialog(true);
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      // Call initial fetch function to refresh data
-      const { error } = await supabase.functions.invoke('initial-fetch', {
-        body: {}
-      });
-      
-      if (error) throw error;
-      
-      // Reload the digest after refresh
-      setTimeout(() => {
-        loadTodaysDigest();
-        toast({
-          title: "Refreshed",
-          description: "Your digest has been updated with the latest emails.",
-        });
-      }, 2000);
-    } catch (error) {
-      console.error('Error refreshing:', error);
-      toast({
-        title: "Refresh failed",
-        description: "Could not refresh your digest. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const loadTodaysDigest = async () => {
-    if (!user) return;
-    
-    try {
-      const today = new Date().toISOString().split('T')[0];
-      
-      // Get today's digest
-      const { data: digest } = await supabase
-        .from('digests')
-        .select('emails')
-        .eq('user_id', user.id)
-        .eq('date', today)
-        .maybeSingle();
-
-      // Check if user has Gmail connection
-      const { data: profile } = await supabase
-        .from('user_profiles')
-        .select('gmail_refresh_token')
-        .eq('user_id', user.id)
-        .maybeSingle();
-
-      setHasGmailConnection(!!profile?.gmail_refresh_token);
-      const digestEmails = Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : [];
-      const filteredEmails = digestEmails.filter(email => email.importance_score >= 0.4);
-      setEmails(filteredEmails);
-      setLastUpdated(new Date());
-    } catch (error) {
-      console.error('Error loading digest:', error);
-      setEmails([]);
-    }
   };
 
   // Show initial fetch overlay if processing
@@ -257,54 +190,15 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
-      {/* Enhanced Header with Stats and Refresh */}
-      <div className="bg-card border border-border-subtle rounded-lg p-6">
-        <div className="flex items-center justify-between mb-4">
-          <div>
-            <h2 className="text-heading-lg font-semibold text-foreground mb-1">
-              Today's Digest
-            </h2>
-            <p className="text-body text-foreground-muted">
-              {new Date().toLocaleDateString('en-US', { 
-                weekday: 'long', 
-                year: 'numeric',
-                month: 'long', 
-                day: 'numeric' 
-              })}
-            </p>
-          </div>
-          
-          <Button
-            onClick={handleRefresh}
-            disabled={isRefreshing}
-            variant="outline"
-            size="sm"
-            className="gap-2"
-          >
-            <RefreshCw className={`w-4 h-4 ${isRefreshing ? 'animate-spin' : ''}`} />
-            Refresh
-          </Button>
-        </div>
-        
-        {/* Quick Stats */}
-        <div className="flex items-center gap-6 text-sm">
-          <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-primary rounded-full"></div>
-            <span className="text-foreground-muted">
-              {emails.length > 0 
-                ? `${emails.length} important ${emails.length === 1 ? 'email' : 'emails'}`
-                : 'No important emails today'
-              }
-            </span>
-          </div>
-          
-          {lastUpdated && (
-            <div className="flex items-center gap-2 text-foreground-muted">
-              <Clock className="w-3 h-3" />
-              <span>Last updated: {lastUpdated.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
-            </div>
-          )}
-        </div>
+      <div className="py-3 px-4">
+        <h2 className="text-heading-lg text-foreground">Today's Digest</h2>
+        <p className="text-body text-foreground-muted">
+          {`${emails.length} important ${emails.length === 1 ? 'email' : 'emails'} • ${new Date().toLocaleDateString('en-US', { 
+            weekday: 'long', 
+            month: 'short', 
+            day: 'numeric' 
+          })}`}
+        </p>
       </div>
       
       <div className="space-y-4">

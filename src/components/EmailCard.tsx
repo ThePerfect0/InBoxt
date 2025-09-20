@@ -65,7 +65,7 @@ export function EmailCard({ email }: EmailCardProps) {
       if (error) throw error;
 
       toast({
-        title: "✅ Added to tasks",
+        title: "Added to tasks",
         description: `"${email.subject}" has been saved to your tasks.`,
       });
     } catch (error) {
@@ -88,8 +88,8 @@ export function EmailCard({ email }: EmailCardProps) {
   };
 
   return (
-    <div className="p-6 bg-card border border-border-subtle rounded-lg hover:bg-card-hover hover:shadow-lg hover:scale-[1.01] transition-all duration-200 group" role="article" aria-label={`Email from ${email.from.name}: ${email.subject}`}>
-      <div className="flex items-start gap-4">
+    <div className="p-4 bg-card border border-border-subtle rounded-lg card-interactive group" role="article" aria-label={`Email from ${email.from.name}: ${email.subject}`}>
+      <div className="flex items-start gap-3">
         {/* Avatar */}
         <Avatar className="h-10 w-10 flex-shrink-0">
           {email.from.avatar ? (
@@ -107,9 +107,9 @@ export function EmailCard({ email }: EmailCardProps) {
 
         {/* Content */}
         <div className="flex-1 min-w-0">
-          <div className="flex items-center justify-between mb-2">
+          <div className="flex items-center justify-between mb-1">
             <div className="flex items-center gap-2 min-w-0">
-              <span className="text-sm font-semibold text-foreground truncate">
+              <span className="text-sm font-medium text-foreground truncate">
                 {email.from.name}
               </span>
               <span className="text-caption">
@@ -124,11 +124,11 @@ export function EmailCard({ email }: EmailCardProps) {
             </Chip>
           </div>
 
-          <h3 className="text-body font-medium text-foreground line-clamp-2 mb-3 leading-snug">
+          <h3 className="text-body font-medium text-foreground truncate-1 mb-2">
             {email.subject}
           </h3>
 
-          <p className="text-body text-foreground-muted line-clamp-2 mb-4 leading-relaxed">
+          <p className="text-body text-foreground-muted truncate-2 mb-3">
             {email.gist}
           </p>
 
@@ -138,7 +138,7 @@ export function EmailCard({ email }: EmailCardProps) {
               variant="secondary"
               size="sm"
               onClick={() => window.open(email.emailUrl, '_blank')}
-              className="text-xs hover:scale-105 transition-transform duration-150"
+              className="text-xs interactive"
               aria-label={`Open email "${email.subject}" in Gmail`}
             >
               <ExternalLink className="h-3 w-3 mr-1.5" />
@@ -148,7 +148,7 @@ export function EmailCard({ email }: EmailCardProps) {
             <Button
               size="sm"
               onClick={handleSaveToTasks}
-              className="text-xs hover:scale-105 transition-transform duration-150"
+              className="text-xs interactive"
               aria-label={`Save email "${email.subject}" to tasks`}
             >
               <Plus className="h-3 w-3 mr-1.5" />

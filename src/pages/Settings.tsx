@@ -9,10 +9,8 @@ import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 
 export function Settings() {
-  const [digestFrequency, setDigestFrequency] = useState("once");
-  const [digestTimes, setDigestTimes] = useState(["08:00"]);
+  const [dailyTime, setDailyTime] = useState("08:00");
   const [topCount, setTopCount] = useState(5);
-  const [skipWeekends, setSkipWeekends] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
@@ -42,7 +40,7 @@ export function Settings() {
           variant: "destructive",
         });
       } else if (data) {
-        setDigestTimes([data.prefs_check_time || "08:00"]);
+        setDailyTime(data.prefs_check_time || "08:00");
         setTopCount(data.prefs_top_n || 5);
       }
     } catch (error) {
@@ -60,7 +58,7 @@ export function Settings() {
     try {
       const { error } = await supabase.functions.invoke('settings-save', {
         body: {
-          prefs_check_time: digestTimes[0],
+          prefs_check_time: dailyTime,
           prefs_top_n: topCount
         }
       });
@@ -117,59 +115,23 @@ export function Settings() {
         </div>
 
         <div className="space-y-6">
-          {/* Multi-frequency Digest */}
-          <div className="space-y-4">
-            <Label htmlFor="digest-frequency" className="text-body font-medium text-foreground">
-              Digest frequency
+          {/* Daily Check Time */}
+          <div className="space-y-2">
+            <Label htmlFor="daily-time" className="text-body font-medium text-foreground">
+              Daily check time
             </Label>
-            <Select value={digestFrequency} onValueChange={(value) => {
-              setDigestFrequency(value);
-              const defaultTimes = {
-                once: ["08:00"],
-                twice: ["08:00", "18:00"],
-                three: ["08:00", "13:00", "18:00"],
-                four: ["08:00", "12:00", "16:00", "20:00"]
-              };
-              setDigestTimes(defaultTimes[value as keyof typeof defaultTimes] || ["08:00"]);
-            }}>
-              <SelectTrigger id="digest-frequency" className="w-48" aria-label="Digest frequency">
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="once">Once daily</SelectItem>
-                <SelectItem value="twice">Twice daily</SelectItem>
-                <SelectItem value="three">3 times daily</SelectItem>
-                <SelectItem value="four">4 times daily</SelectItem>
-              </SelectContent>
-            </Select>
-            
-            {/* Time Pickers */}
-            <div className="space-y-3">
-              {digestTimes.map((time, index) => (
-                <div key={index} className="flex items-center gap-3">
-                  <Clock className="w-4 h-4 text-foreground-muted" />
-                  <Input
-                    id={`digest-time-${index}`}
-                    name={`digest-time-${index}`}
-                    type="time"
-                    value={time}
-                    onChange={(e) => {
-                      const newTimes = [...digestTimes];
-                      newTimes[index] = e.target.value;
-                      setDigestTimes(newTimes);
-                    }}
-                    className="w-40"
-                    aria-label={`Digest ${index + 1} time`}
-                  />
-                  <span className="text-sm text-foreground-muted">
-                    Digest {index + 1}
-                  </span>
-                </div>
-              ))}
+            <div className="flex items-center gap-3">
+              <Clock className="w-4 h-4 text-foreground-muted" />
+              <Input
+                id="daily-time"
+                type="time"
+                value={dailyTime}
+                onChange={(e) => setDailyTime(e.target.value)}
+                className="w-40"
+              />
             </div>
-            
             <p className="text-body-sm text-foreground-muted">
-              Multiple digests distribute your top emails throughout the day
+              InBoxt will scan your emails at this time every day
             </p>
           </div>
 
@@ -179,7 +141,7 @@ export function Settings() {
               Number of top emails to show
             </Label>
             <Select value={topCount.toString()} onValueChange={(value) => setTopCount(Number(value))}>
-              <SelectTrigger id="top-count" className="w-48" aria-label="Number of top emails">
+              <SelectTrigger className="w-48">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
