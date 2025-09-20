@@ -1,5 +1,4 @@
-// Deno global is available at runtime; this declaration silences IDE TypeScript lint in the monorepo.
-declare const Deno: any;
+/// <reference path="../deno-env.d.ts" />
 
 interface OpenRouterConfig {
   model: string;
