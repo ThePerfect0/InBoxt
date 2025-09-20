@@ -22,7 +22,7 @@ trigger: always_on
      ```bash
      python userinput.py
      ```
-   * The terminal should be opened in the chat window itself. Run it in chat window no matter what!!!
+   * The terminal should be opened in the chat window itself.
 
    * Read the user's input.
 
