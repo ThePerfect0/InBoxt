@@ -1,6 +1,3 @@
-// Deno global is available at runtime; this declaration silences IDE TypeScript lint in the monorepo.
-declare const Deno: any;
-
 interface OpenRouterConfig {
   model: string;
   system: string;
@@ -144,8 +141,8 @@ export async function callLLM(config: OpenRouterConfig): Promise<OpenRouterRespo
 export async function extractGist(emailText: string): Promise<{ gist: string } | null> {
   const result = await callLLM({
     model: 'openai/gpt-4o-mini',
-    system: 'You are an expert email summarizer. Output strictly a minified JSON object matching this exact schema: { "gist": string }. The gist must be concise (1–3 sentences), focus on purpose/action, avoid sensitive details (like passwords, OTPs, account numbers), and be safe to display. Do not include code fences or any extra text besides the JSON.',
-    prompt: 'Summarize the email content and return ONLY JSON in the exact shape { "gist": string }.',
+    system: 'You are an expert at summarizing emails. Extract the key points in exactly 2 sentences or less. Be concise and capture the main purpose/request.',
+    prompt: 'Summarize this email in 2 sentences maximum:',
     input: emailText.slice(0, 2000), // Limit input size
     response_format: 'json'
   });
@@ -161,8 +158,8 @@ export async function extractGist(emailText: string): Promise<{ gist: string } |
 export async function calculateImportance(emailText: string, sender: string, subject: string): Promise<{ importance: number } | null> {
   const result = await callLLM({
     model: 'openai/gpt-4o-mini',
-    system: 'You are an expert at analyzing email importance. Output strictly JSON with this exact schema: { "importance": number }. Score from 0 to 1 using: sender authority, urgency, explicit deadlines, actionable requests, meeting invites, follow-ups. 0=newsletters/spam, 0.3=general info, 0.5=normal business, 0.7=important, 1.0=urgent/critical. Only return the JSON object, no extra text.',
-    prompt: 'Analyze the email and return ONLY JSON { "importance": number } with a value between 0 and 1.',
+    system: 'You are an expert at analyzing email importance. Return a score from 0-1 based on: sender authority, urgency keywords, explicit deadlines, actionable requests. 0 = newsletters/spam, 0.5 = normal business, 1 = urgent/critical.',
+    prompt: 'Analyze the importance of this email and return a score from 0 to 1:',
     input: JSON.stringify({ sender, subject, content: emailText.slice(0, 1500) }),
     response_format: 'json'
   });
@@ -179,8 +176,8 @@ export async function calculateImportance(emailText: string, sender: string, sub
 export async function extractDeadline(emailText: string, subject: string): Promise<{ deadline: string | null } | null> {
   const result = await callLLM({
     model: 'openai/gpt-4o-mini',
-    system: 'You are an expert at extracting dates from emails. Output strictly JSON with this exact schema: { "deadline": string | null }. Only include a date if explicitly present or strongly implied with a specific date; otherwise return null. When present, format date as YYYY-MM-DD. Return ONLY the JSON object, no extra text.',
-    prompt: 'Extract a deadline / due date / meeting date if present, otherwise null. Return ONLY JSON { "deadline": string | null } with format YYYY-MM-DD when present.',
+    system: 'You are an expert at extracting deadlines from emails. Only return a deadline if explicitly mentioned or strongly implied. Format as YYYY-MM-DD. Return null if uncertain.',
+    prompt: 'Extract any deadline from this email. Only return a date if you are confident:',
     input: JSON.stringify({ subject, content: emailText.slice(0, 1500) }),
     response_format: 'json'
   });

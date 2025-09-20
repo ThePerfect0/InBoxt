@@ -1,8 +1,6 @@
-// Deno typings (available at runtime). This declaration silences IDE TypeScript in web workspace.
-declare const Deno: any;
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
-import { fetchGmailEmails, refreshGmailToken } from '../shared/gmail.ts';
+import { fetchGmailEmails } from '../shared/gmail.ts';
 import { extractGist, calculateImportance, extractDeadline } from '../shared/openrouter.ts';
 
 const corsHeaders = {
@@ -16,17 +14,6 @@ interface ProcessingStats {
   aiCalls: number;
   errors: number;
   processingTimeMs: number;
-}
-
-interface ProcessedEmail {
-  email_id: string;
-  gist: string;
-  sender: string;
-  subject: string;
-  link: string;
-  importance_score: number;
-  deadline: string | null;
-  processed_at: string;
 }
 
 serve(async (req) => {
@@ -94,14 +81,14 @@ serve(async (req) => {
 
     const topN = userData?.prefs_top_n || 5;
 
-    // Get Gmail tokens from user profile
+    // Get Gmail access token from user profile
     const { data: profile } = await supabase
       .from('user_profiles')
-      .select('gmail_access_token, gmail_refresh_token')
+      .select('gmail_access_token')
       .eq('user_id', user.id)
       .single();
 
-    if (!profile?.gmail_refresh_token && !profile?.gmail_access_token) {
+    if (!profile?.gmail_access_token) {
       return new Response(JSON.stringify({
         success: false,
         error: 'Gmail not connected'
@@ -122,30 +109,7 @@ serve(async (req) => {
     try {
       // Fetch emails from Gmail
       console.log('Fetching emails from Gmail...');
-      let accessToken = profile.gmail_access_token;
-      let gmailEmails;
-      try {
-        gmailEmails = await fetchGmailEmails(accessToken);
-      } catch (err) {
-        console.warn('Initial Gmail fetch failed, attempting token refresh...', err);
-        if (profile.gmail_refresh_token) {
-          const newAccess = await refreshGmailToken(profile.gmail_refresh_token);
-          if (newAccess) {
-            accessToken = newAccess;
-            // Persist new access token
-            await supabase
-              .from('user_profiles')
-              .update({ gmail_access_token: newAccess })
-              .eq('user_id', user.id);
-            // Retry fetch
-            gmailEmails = await fetchGmailEmails(accessToken);
-          } else {
-            throw new Error('Failed to refresh Gmail access token');
-          }
-        } else {
-          throw err;
-        }
-      }
+      const gmailEmails = await fetchGmailEmails(profile.gmail_access_token);
       stats.emailsFetched = gmailEmails.length;
       
       console.log(`Fetched ${gmailEmails.length} emails`);
@@ -172,7 +136,7 @@ serve(async (req) => {
 
       // Process emails with AI
       console.log('Processing emails with AI...');
-      const processedEmails: ProcessedEmail[] = [];
+      const processedEmails = [];
       
       for (const email of gmailEmails) {
         try {
@@ -190,14 +154,14 @@ serve(async (req) => {
           const deadlineResult = await extractDeadline(email.text, email.subject);
           stats.aiCalls++;
           
-          const processedEmail: ProcessedEmail = {
+          const processedEmail = {
             email_id: email.id,
             gist: gistResult?.gist || email.snippet || 'Unable to summarize',
             sender: email.sender,
             subject: email.subject,
             link: `https://mail.google.com/mail/u/0/#inbox/${email.id}`,
             importance_score: importanceResult?.importance || 0.5,
-            deadline: deadlineResult?.deadline ?? null,
+            deadline: deadlineResult?.deadline,
             processed_at: new Date().toISOString()
           };
           
