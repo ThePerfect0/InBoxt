@@ -28,32 +28,18 @@ export function Auth() {
     e.preventDefault();
     setIsLoading(true);
 
-    // Clear previous errors
-    setEmailError("");
-    setPasswordError("");
-
-    // Validate inputs
-    const isEmailValid = validateEmail(email);
-    const isPasswordValid = validatePassword(password);
-
-    if (!isEmailValid || !isPasswordValid) {
-      setIsLoading(false);
-      return;
-    }
-
     try {
       const { error } = isLogin 
         ? await signIn(email, password)
         : await signUp(email, password);
 
       if (error) {
-        
         if (error.message.includes('Email not confirmed')) {
           toast({
             title: "Please check your email",
             description: "We've sent you a confirmation link. Click it to activate your account.",
           });
-        } else if (error.message.includes('Invalid login credentials') || error.message.includes('Invalid email or password')) {
+        } else if (error.message.includes('Invalid login credentials')) {
           toast({
             title: "Invalid credentials",
             description: "Please check your email and password and try again.",
@@ -66,10 +52,6 @@ export function Auth() {
             variant: "destructive",
           });
           setIsLogin(true);
-        } else if (error.message.includes('Password should be at least 6 characters')) {
-          setPasswordError("Password must be at least 6 characters");
-        } else if (error.message.includes('Unable to validate email address')) {
-          setEmailError("Please enter a valid email address");
         } else {
           toast({
             title: "Authentication failed",
@@ -82,7 +64,6 @@ export function Auth() {
           // For new signups, show connect email dialog
           setShowConnectDialog(true);
         }
-        
         toast({
           title: isLogin ? "Welcome back!" : "Account created!",
           description: isLogin ? "You've been signed in successfully." : "Please check your email to confirm your account.",

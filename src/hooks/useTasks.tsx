@@ -1,4 +1,8 @@
+<<<<<<< HEAD
 import { useState, useEffect, useCallback, useTransition } from "react";
+=======
+import { useState, useEffect } from "react";
+>>>>>>> 8acf51f56335fae66838e9ed71c936f0aa720f7d
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -21,13 +25,25 @@ export function useTasks() {
   const { user } = useAuth();
   const [isPending, startTransition] = useTransition();
 
-  const loadTasks = useCallback(async () => {
+  useEffect(() => {
+    if (user) {
+      console.log('Loading tasks for user:', user.id);
+      loadTasks();
+    } else {
+      console.log('No user found, not loading tasks');
+      setIsLoading(false);
+    }
+  }, [user]);
+
+  const loadTasks = async () => {
     if (!user?.id) {
+      console.log('No user ID available for loading tasks');
       setIsLoading(false);
       return;
     }
 
     try {
+      console.log('Loading tasks for user ID:', user.id);
       const { data, error } = await supabase
         .from('tasks')
         .select('*')
@@ -35,8 +51,11 @@ export function useTasks() {
         .order('created_at', { ascending: false });
 
       if (error) {
+        console.error('Supabase error loading tasks:', error);
         throw error;
       }
+
+      console.log('Raw tasks data from database:', data);
 
       const mappedTasks: Task[] = (data || []).map(task => ({
         id: task.id,
@@ -50,8 +69,10 @@ export function useTasks() {
         completedAt: task.status === 'completed' ? new Date(task.updated_at) : undefined,
       }));
 
+      console.log('Mapped tasks:', mappedTasks);
       setTasks(mappedTasks);
     } catch (error) {
+      console.error('Error loading tasks:', error);
       toast({
         title: "Error",
         description: "Failed to load tasks.",
@@ -60,8 +81,9 @@ export function useTasks() {
     } finally {
       setIsLoading(false);
     }
-  }, [user?.id]);
+  };
 
+<<<<<<< HEAD
   useEffect(() => {
     if (user) {
       loadTasks();
@@ -73,19 +95,43 @@ export function useTasks() {
   const toggleComplete = useCallback(async (id: string) => {
     const task = tasks.find(t => t.id === id);
     if (!task) return;
+=======
+  const toggleComplete = async (id: string) => {
+    try {
+      const task = tasks.find(t => t.id === id);
+      if (!task) return;
+>>>>>>> 8acf51f56335fae66838e9ed71c936f0aa720f7d
 
     const newStatus = task.status === 'completed' ? 'pending' : 'completed';
     const previousTasks = tasks;
 
+<<<<<<< HEAD
     // Optimistic UI update
     startTransition(() => {
+=======
+      const { error } = await supabase.functions.invoke('task-operations', {
+        body: {
+          action: 'update',
+          id,
+          status: newStatus
+        }
+      });
+
+      if (error) throw error;
+
+      // Update local state
+>>>>>>> 8acf51f56335fae66838e9ed71c936f0aa720f7d
       setTasks(prev => prev.map(t => 
         t.id === id 
           ? {
               ...t,
               status: newStatus,
+<<<<<<< HEAD
               updated_at: new Date(),
               completedAt: newStatus === 'completed' ? new Date() : undefined,
+=======
+              completedAt: newStatus === 'completed' ? new Date() : undefined
+>>>>>>> 8acf51f56335fae66838e9ed71c936f0aa720f7d
             }
           : t
       ));
@@ -118,6 +164,7 @@ export function useTasks() {
         description: `"${task.title}" has been ${newStatus === 'completed' ? 'marked as complete' : 'reopened'}.`,
       });
     } catch (error) {
+<<<<<<< HEAD
       // Rollback on failure
       startTransition(() => setTasks(previousTasks));
       toast({
@@ -127,6 +174,16 @@ export function useTasks() {
       });
     }
   }, [tasks, user?.id, startTransition]);
+=======
+      console.error('Error toggling task:', error);
+      toast({
+        title: "Error",
+        description: "Failed to update task.",
+        variant: "destructive",
+      });
+    }
+  };
+>>>>>>> 8acf51f56335fae66838e9ed71c936f0aa720f7d
 
   const deleteTask = async (id: string) => {
     try {
