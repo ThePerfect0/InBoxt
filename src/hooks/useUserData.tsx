@@ -44,13 +44,8 @@ export function useUserData(): UseUserDataReturn {
           .from('digests')
           .select('*')
           .eq('user_id', user.id)
-          .gte('date', (() => {
-            const d = new Date();
-            d.setMonth(d.getMonth() - 6);
-            return d.toISOString().split('T')[0];
-          })())
           .order('date', { ascending: false })
-          .limit(180), // Up to ~6 months of digests
+          .limit(30), // Last 30 digests
         
         supabase
           .from('tasks')
