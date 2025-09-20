@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useTransition } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "./useAuth";
 import { toast } from "@/hooks/use-toast";
@@ -19,7 +19,6 @@ export function useTasks() {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const { user } = useAuth();
-  const [isPending, startTransition] = useTransition();
 
   const loadTasks = useCallback(async () => {
     if (!user?.id) {
@@ -71,62 +70,68 @@ export function useTasks() {
   }, [user, loadTasks]);
 
   const toggleComplete = useCallback(async (id: string) => {
-    const task = tasks.find(t => t.id === id);
-    if (!task) return;
-
-    const newStatus = task.status === 'completed' ? 'pending' : 'completed';
-    const previousTasks = tasks;
-
-    // Optimistic UI update
-    startTransition(() => {
-      setTasks(prev => prev.map(t => 
-        t.id === id 
-          ? {
-              ...t,
-              status: newStatus,
-              updated_at: new Date(),
-              completedAt: newStatus === 'completed' ? new Date() : undefined,
-            }
-          : t
-      ));
-    });
-
     try {
-      // Try direct DB update, fallback to edge function
-      let updateError = null as any;
+      const task = tasks.find(t => t.id === id);
+      if (!task) {
+        return;
+      }
+
+      const newStatus = task.status === 'completed' ? 'pending' : 'completed';
+
+      // Try direct database update first, fallback to edge function
+      let updateError = null;
+      
       try {
         const { error: dbError } = await supabase
           .from('tasks')
-          .update({
+          .update({ 
             status: newStatus,
-            updated_at: new Date().toISOString(),
+            updated_at: new Date().toISOString()
           })
           .eq('id', id)
           .eq('user_id', user?.id);
+
         updateError = dbError;
-      } catch (_) {
+      } catch (dbErr) {
         const { error: funcError } = await supabase.functions.invoke('task-operations', {
-          body: { action: 'update', id, status: newStatus },
+          body: {
+            action: 'update',
+            id,
+            status: newStatus
+          }
         });
+        
         updateError = funcError;
       }
 
-      if (updateError) throw updateError;
+      if (updateError) {
+        throw updateError;
+      }
+
+      // Update local state
+      setTasks(prev => prev.map(t => 
+        t.id === id 
+          ? { 
+              ...t, 
+              status: newStatus,
+              updated_at: new Date(),
+              completedAt: newStatus === 'completed' ? new Date() : undefined
+            }
+          : t
+      ));
 
       toast({
-        title: newStatus === 'completed' ? 'Task completed' : 'Task reopened',
+        title: newStatus === 'completed' ? "Task completed" : "Task reopened",
         description: `"${task.title}" has been ${newStatus === 'completed' ? 'marked as complete' : 'reopened'}.`,
       });
     } catch (error) {
-      // Rollback on failure
-      startTransition(() => setTasks(previousTasks));
       toast({
-        title: 'Error',
-        description: 'Failed to update task. Please try again.',
-        variant: 'destructive',
+        title: "Error",
+        description: "Failed to update task. Please try again.",
+        variant: "destructive",
       });
     }
-  }, [tasks, user?.id, startTransition]);
+  }, [tasks, user?.id]);
 
   const deleteTask = async (id: string) => {
     try {
