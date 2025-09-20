@@ -60,7 +60,7 @@ export function Settings() {
     try {
       const { error } = await supabase.functions.invoke('settings-save', {
         body: {
-          prefs_check_time: dailyTime,
+          prefs_check_time: digestTimes[0],
           prefs_top_n: topCount
         }
       });
@@ -119,7 +119,7 @@ export function Settings() {
         <div className="space-y-6">
           {/* Multi-frequency Digest */}
           <div className="space-y-4">
-            <Label className="text-body font-medium text-foreground">
+            <Label htmlFor="digest-frequency" className="text-body font-medium text-foreground">
               Digest frequency
             </Label>
             <Select value={digestFrequency} onValueChange={(value) => {
@@ -132,7 +132,7 @@ export function Settings() {
               };
               setDigestTimes(defaultTimes[value as keyof typeof defaultTimes] || ["08:00"]);
             }}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger id="digest-frequency" className="w-48" aria-label="Digest frequency">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
@@ -149,6 +149,8 @@ export function Settings() {
                 <div key={index} className="flex items-center gap-3">
                   <Clock className="w-4 h-4 text-foreground-muted" />
                   <Input
+                    id={`digest-time-${index}`}
+                    name={`digest-time-${index}`}
                     type="time"
                     value={time}
                     onChange={(e) => {
@@ -157,6 +159,7 @@ export function Settings() {
                       setDigestTimes(newTimes);
                     }}
                     className="w-40"
+                    aria-label={`Digest ${index + 1} time`}
                   />
                   <span className="text-sm text-foreground-muted">
                     Digest {index + 1}
@@ -176,7 +179,7 @@ export function Settings() {
               Number of top emails to show
             </Label>
             <Select value={topCount.toString()} onValueChange={(value) => setTopCount(Number(value))}>
-              <SelectTrigger className="w-48">
+              <SelectTrigger id="top-count" className="w-48" aria-label="Number of top emails">
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>

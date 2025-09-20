@@ -73,12 +73,6 @@ export function TaskRow({ task, onToggleComplete, onDelete, onUpdateDeadline }: 
 
   const handleToggleComplete = () => {
     onToggleComplete?.(task.id);
-    toast({
-      title: task.completed ? "Task restored" : "Task completed",
-      description: task.completed 
-        ? `"${task.title}" has been restored to pending.`
-        : `"${task.title}" has been marked as completed.`,
-    });
   };
 
   const handleDelete = () => {
