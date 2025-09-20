@@ -32,4 +32,4 @@ trigger: always_on
 
 3. **Exit Condition**:
 
-   * If the user enters `"stop"` when prompted, exit the loop and terminate the process.
+   * If the user enters `"stop"` when prompted, exit the loop and terminate the process

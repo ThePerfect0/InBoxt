@@ -1,0 +1,482 @@
+[
+  {
+    "id": "TC001",
+    "title": "User Registration with Email and Password",
+    "description": "Verify that a new user can register successfully using email and password authentication.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the registration page."
+      },
+      {
+        "type": "action",
+        "description": "Enter a valid email address and a strong password."
+      },
+      {
+        "type": "action",
+        "description": "Submit the registration form."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the user is successfully registered and redirected to the onboarding wizard."
+      }
+    ]
+  },
+  {
+    "id": "TC002",
+    "title": "OAuth Login via Google",
+    "description": "Ensure a user can log in using the Google OAuth provider.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the login page."
+      },
+      {
+        "type": "action",
+        "description": "Click the Google login button."
+      },
+      {
+        "type": "action",
+        "description": "Complete OAuth flow and grant required permissions."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm user is authenticated and redirected to the onboarding wizard or dashboard if previously onboarded."
+      }
+    ]
+  },
+  {
+    "id": "TC003",
+    "title": "Onboarding Wizard: Email Integration Setup",
+    "description": "Verify the onboarding wizard securely connects to the user's email provider and saves OAuth tokens.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Complete login and enter onboarding wizard."
+      },
+      {
+        "type": "action",
+        "description": "Choose email provider and initiate OAuth connection."
+      },
+      {
+        "type": "action",
+        "description": "Grant permissions and complete setup."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm OAuth tokens are securely stored and wizard progresses to preference customization."
+      }
+    ]
+  },
+  {
+    "id": "TC004",
+    "title": "Onboarding Wizard: Digest Scheduling and Preferences",
+    "description": "Check that users can select digest scheduling times and customize preferences during onboarding.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate through onboarding wizard to preferences stage."
+      },
+      {
+        "type": "action",
+        "description": "Select preferred digest delivery time and number of top emails."
+      },
+      {
+        "type": "action",
+        "description": "Submit preferences."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify preferences are saved and persisted."
+      }
+    ]
+  },
+  {
+    "id": "TC005",
+    "title": "Daily Email Fetch and AI Processing Success",
+    "description": "Validate that the system successfully fetches unread emails, processes them with AI to extract gists and importance scores, and stores the digest.",
+    "category": "integration",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger or wait for Supabase cron job to fetch unread emails."
+      },
+      {
+        "type": "action",
+        "description": "Ensure emails are processed through OpenRouter AI API."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm gists and importance scores are generated and stored correctly with importance threshold applied (≥ 0.4)."
+      }
+    ]
+  },
+  {
+    "id": "TC006",
+    "title": "Daily Digest Dashboard Display",
+    "description": "Ensure today’s digest loads correctly displaying important email summaries, quick stats, and functional refresh button.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in and navigate to the dashboard page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that emails with importance ≥ 0.4 are displayed with gists and direct links."
+      },
+      {
+        "type": "assertion",
+        "description": "Check that quick stats about the digest are shown."
+      },
+      {
+        "type": "action",
+        "description": "Click the refresh button."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm digest refreshes successfully without errors."
+      }
+    ]
+  },
+  {
+    "id": "TC007",
+    "title": "Dashboard Prompt to Connect Gmail if Missing",
+    "description": "Verify that the dashboard displays a prompt to connect Gmail if no email integration exists.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Log in with a user lacking connected email account."
+      },
+      {
+        "type": "assertion",
+        "description": "Dashboard should show a prompt or call-to-action to connect Gmail."
+      }
+    ]
+  },
+  {
+    "id": "TC008",
+    "title": "Historical Digest View and Natural Language Search",
+    "description": "Check the historical digest view displays digests for last 30 days and that the natural language search for emails works correctly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the history page."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that recent digests for the last 30 days are listed with correctly formatted dates and email cards."
+      },
+      {
+        "type": "action",
+        "description": "Enter a natural language query in the search bar."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that search results relevancy aligns with user query and emails from digests are filtered accordingly."
+      }
+    ]
+  },
+  {
+    "id": "TC009",
+    "title": "Save Email as Task with AI-Inferred Deadline",
+    "description": "Validate saving an email as a task with correct AI-inferred deadline extraction.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "From today’s digest, select an email and choose to save as a task."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure the task is created with subject, gist, and AI inferred deadline populated correctly."
+      }
+    ]
+  },
+  {
+    "id": "TC010",
+    "title": "Task Management CRUD Operations",
+    "description": "Verify tasks can be edited (changing deadline), marked as completed/uncompleted, and deleted with UI updating accordingly.",
+    "category": "functional",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to tasks page."
+      },
+      {
+        "type": "action",
+        "description": "Edit deadline of an existing task."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the update is saved and shown in the task list."
+      },
+      {
+        "type": "action",
+        "description": "Toggle task completion status."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify task is moved between pending and completed tabs accurately."
+      },
+      {
+        "type": "action",
+        "description": "Delete a task."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm the task is removed from the list."
+      }
+    ]
+  },
+  {
+    "id": "TC011",
+    "title": "Session and Permission Security Handling",
+    "description": "Verify that sessions are handled securely, credentials and tokens are stored securely, and unauthorized access is prevented.",
+    "category": "security",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Attempt to access dashboard without authentication."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that access is denied and user is redirected to login."
+      },
+      {
+        "type": "action",
+        "description": "Check stored OAuth and session tokens for encryption/security compliance."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify tokens cannot be accessed by unauthorized scripts or users."
+      }
+    ]
+  },
+  {
+    "id": "TC012",
+    "title": "Data Retention and Privacy Compliance",
+    "description": "Verify that digests and tasks are retained only for 90 days and that the system transiently processes email content respecting privacy-first design.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Query digest and task data older than 90 days."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that data older than 90 days is purged or inaccessible."
+      },
+      {
+        "type": "action",
+        "description": "Inspect logs or data flow to verify email content is not stored permanently beyond transient processing."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify compliance with stated privacy design."
+      }
+    ]
+  },
+  {
+    "id": "TC013",
+    "title": "Responsive UI Rendering on Desktop and Mobile",
+    "description": "Validate the application UI renders correctly and remains fully functional on various screen sizes including desktop and mobile.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Open app on desktop browser and navigate through all main pages."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify UI layout is correct, no visual overlaps or layout breaks, and accessibility attributes are present."
+      },
+      {
+        "type": "action",
+        "description": "Open app on mobile device or emulator and repeat navigation."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm responsive layout adapts properly and all controls remain accessible and usable."
+      }
+    ]
+  },
+  {
+    "id": "TC014",
+    "title": "Accessibility Compliance Check (WCAG 2.1 AA)",
+    "description": "Check that UI components meet accessibility standards including keyboard navigability, proper color contrast, and screen reader support.",
+    "category": "ui",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Use keyboard only to navigate through pages and interact with all controls."
+      },
+      {
+        "type": "assertion",
+        "description": "Ensure all interactive elements are focusable and operable via keyboard."
+      },
+      {
+        "type": "action",
+        "description": "Use screen reader to browse key pages."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify meaningful ARIA roles and labels are present for screen reader users."
+      },
+      {
+        "type": "action",
+        "description": "Use color contrast analyzer tool on UI elements."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm color contrast meets WCAG 2.1 AA minimum thresholds."
+      }
+    ]
+  },
+  {
+    "id": "TC015",
+    "title": "Loading State Handling for Digest and Tasks",
+    "description": "Validate appropriate loading indicators are displayed while digest and task data are being fetched or updated.",
+    "category": "ui",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to dashboard and trigger digest data refresh."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that a loading indicator is displayed until data loads."
+      },
+      {
+        "type": "action",
+        "description": "Navigate to tasks page and perform updates (toggle completion, editing deadlines)."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm loading or progress states show during asynchronous operations."
+      }
+    ]
+  },
+  {
+    "id": "TC016",
+    "title": "Performance: Digest Loading Within 2 Seconds",
+    "description": "Verify that the daily digest dashboard page loads digest data within 2 seconds under normal network conditions.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to the dashboard page on a normal network."
+      },
+      {
+        "type": "assertion",
+        "description": "Measure and confirm that digest data and UI completes loading in under 2 seconds."
+      }
+    ]
+  },
+  {
+    "id": "TC017",
+    "title": "Performance: AI Processing Within 30 Seconds",
+    "description": "Ensure that the AI processing step for gist extraction and importance scoring completes within 30 seconds.",
+    "category": "performance",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Trigger email fetching and processing via the Supabase cron job or initial fetch flow."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that the AI processing completes successfully within 30 seconds."
+      }
+    ]
+  },
+  {
+    "id": "TC018",
+    "title": "Error Handling: Email Fetch Failures",
+    "description": "Confirm that email fetch failures are gracefully handled with proper user notifications and retry options.",
+    "category": "error handling",
+    "priority": "High",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate failure in email fetch process (e.g. revoke OAuth tokens or cause network error)."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify error notification is shown to the user explaining the issue."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm that retry mechanism or instructions to reconnect email is presented."
+      }
+    ]
+  },
+  {
+    "id": "TC019",
+    "title": "Error Handling: AI Processing Failures",
+    "description": "Ensure the system handles AI API failures gracefully, notifying users and avoiding system crashes.",
+    "category": "error handling",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Simulate AI API endpoint unavailability or failure during gist extraction."
+      },
+      {
+        "type": "assertion",
+        "description": "Verify that appropriate error message is displayed or logged without crashing the system."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm system recovers or alerts user to retry later."
+      }
+    ]
+  },
+  {
+    "id": "TC020",
+    "title": "Settings Update and Persistence",
+    "description": "Verify that user preferences such as digest time and number of top emails can be updated in settings and persist after reload.",
+    "category": "functional",
+    "priority": "Medium",
+    "steps": [
+      {
+        "type": "action",
+        "description": "Navigate to settings page."
+      },
+      {
+        "type": "action",
+        "description": "Modify digest delivery time and number of top emails."
+      },
+      {
+        "type": "action",
+        "description": "Save settings."
+      },
+      {
+        "type": "assertion",
+        "description": "Confirm settings persist after page reload or logout/login."
+      }
+    ]
+  }
+]
