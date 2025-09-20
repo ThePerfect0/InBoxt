@@ -1,4 +1,5 @@
-/// <reference path="../deno-env.d.ts" />
+// Deno typings (available at runtime). This declaration silences IDE TypeScript in web workspace.
+declare const Deno: any;
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 import { fetchGmailEmails, refreshGmailToken } from '../shared/gmail.ts';
