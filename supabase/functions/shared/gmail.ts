@@ -1,3 +1,5 @@
+/// <reference path="../deno-env.d.ts" />
+
 interface GmailMessage {
   id: string;
   sender: string;
