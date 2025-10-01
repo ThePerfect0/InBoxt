@@ -144,9 +144,9 @@ export async function callLLM(config: OpenRouterConfig): Promise<OpenRouterRespo
 export async function extractGist(emailText: string): Promise<{ gist: string } | null> {
   const result = await callLLM({
     model: 'openai/gpt-4o-mini',
-    system: 'You are an expert email summarizer. Output strictly a minified JSON object matching this exact schema: { "gist": string }. The gist must be concise (1–3 sentences), focus on purpose/action, avoid sensitive details (like passwords, OTPs, account numbers), and be safe to display. Do not include code fences or any extra text besides the JSON.',
-    prompt: 'Summarize the email content and return ONLY JSON in the exact shape { "gist": string }.',
-    input: emailText.slice(0, 2000), // Limit input size
+    system: 'You are an expert email summarizer. Create a concise, actionable summary that captures the main purpose and key information of the email. The summary should be 1-2 sentences maximum and help the user understand what the email is about at a glance. Focus on: what the sender wants, any actions needed, important dates/deadlines, or key decisions. Avoid copying the email opening verbatim. Output strictly a JSON object: { "gist": string }. Do not include sensitive data like passwords, OTPs, or account numbers.',
+    prompt: 'Read the entire email and create a meaningful summary that explains what this email is about. Do NOT just copy the first sentence. Return ONLY JSON: { "gist": string }',
+    input: emailText.slice(0, 3000), // Increased context
     response_format: 'json'
   });
 
