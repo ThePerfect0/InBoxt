@@ -90,7 +90,7 @@ serve(async (req) => {
       .from('users')
       .select('prefs_top_n')
       .eq('id', user.id)
-      .single();
+      .maybeSingle();
 
     const topN = userData?.prefs_top_n || 5;
 
@@ -99,7 +99,7 @@ serve(async (req) => {
       .from('user_profiles')
       .select('gmail_access_token, gmail_refresh_token')
       .eq('user_id', user.id)
-      .single();
+      .maybeSingle();
 
     if (!profile?.gmail_refresh_token && !profile?.gmail_access_token) {
       return new Response(JSON.stringify({

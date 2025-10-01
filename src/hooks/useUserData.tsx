@@ -154,6 +154,14 @@ export function useUserData(): UseUserDataReturn {
 
     console.log('Setting up real-time subscriptions for user:', user.id);
 
+    const handleDataChange = (payload: any, table: string) => {
+      console.log(`${table} change detected:`, payload);
+      // Use setTimeout to defer the refresh and prevent infinite loops
+      setTimeout(() => {
+        loadUserData();
+      }, 100);
+    };
+
     const subscriptions = [
       // Subscribe to task changes
       supabase
@@ -165,11 +173,7 @@ export function useUserData(): UseUserDataReturn {
             table: 'tasks',
             filter: `user_id=eq.${user.id}`
           }, 
-          (payload) => {
-            console.log('Task change detected:', payload);
-            // Refresh tasks data
-            refreshUserData();
-          }
+          (payload) => handleDataChange(payload, 'tasks')
         )
         .subscribe(),
 
@@ -183,11 +187,7 @@ export function useUserData(): UseUserDataReturn {
             table: 'digests',
             filter: `user_id=eq.${user.id}`
           }, 
-          (payload) => {
-            console.log('Digest change detected:', payload);
-            // Refresh digests data
-            refreshUserData();
-          }
+          (payload) => handleDataChange(payload, 'digests')
         )
         .subscribe(),
 
@@ -201,11 +201,7 @@ export function useUserData(): UseUserDataReturn {
             table: 'user_profiles',
             filter: `user_id=eq.${user.id}`
           }, 
-          (payload) => {
-            console.log('Profile change detected:', payload);
-            // Refresh profile data
-            refreshUserData();
-          }
+          (payload) => handleDataChange(payload, 'user_profiles')
         )
         .subscribe()
     ];
@@ -216,7 +212,7 @@ export function useUserData(): UseUserDataReturn {
         supabase.removeChannel(subscription);
       });
     };
-  }, [user?.id, refreshUserData]);
+  }, [user?.id]);
 
   return {
     userData,

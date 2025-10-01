@@ -32,7 +32,7 @@ export function Settings() {
         .from('users')
         .select('prefs_check_time, prefs_top_n')
         .eq('id', user?.id)
-        .single();
+        .maybeSingle();
 
       if (error) {
         console.error('Error loading settings:', error);

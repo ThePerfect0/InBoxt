@@ -31,39 +31,45 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   useEffect(() => {
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);
         
         // Handle OAuth token storage and user profile creation
         if (event === 'SIGNED_IN' && session?.user) {
-          
-          try {
-            // Ensure user profile exists
-            const { error: profileError } = await supabase
-              .from('user_profiles')
-              .upsert({
-                user_id: session.user.id,
-              }, {
-                onConflict: 'user_id'
-              });
+          // Use setTimeout to defer Supabase calls and prevent deadlock
+          setTimeout(() => {
+            const handleSignIn = async () => {
+              try {
+                // Ensure user profile exists
+                await supabase
+                  .from('user_profiles')
+                  .upsert({
+                    user_id: session.user.id,
+                  }, {
+                    onConflict: 'user_id'
+                  });
 
-            // Store OAuth tokens if available
-            if (session.provider_token) {
-              await supabase
-                .from('user_profiles')
-                .upsert({
-                  user_id: session.user.id,
-                  gmail_access_token: session.provider_token,
-                  gmail_refresh_token: session.provider_refresh_token || null,
-                }, {
-                  onConflict: 'user_id'
-                });
-            }
-          } catch (err) {
-            // Silently handle errors in production
-          }
+                // Store OAuth tokens if available
+                if (session.provider_token) {
+                  await supabase
+                    .from('user_profiles')
+                    .upsert({
+                      user_id: session.user.id,
+                      gmail_access_token: session.provider_token,
+                      gmail_refresh_token: session.provider_refresh_token || null,
+                    }, {
+                      onConflict: 'user_id'
+                    });
+                }
+              } catch (err) {
+                console.error('Error handling sign in:', err);
+              }
+            };
+            
+            handleSignIn();
+          }, 0);
         }
       }
     );

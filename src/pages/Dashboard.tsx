@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { EmailCard } from "@/components/EmailCard";
 import { EmptyState } from "@/components/EmptyState";
@@ -40,96 +40,7 @@ export function Dashboard() {
     digestFetchComplete
   } = useInitialFetch();
 
-  useEffect(() => {
-    if (!user) return;
-
-    const loadTodaysDigest = async () => {
-      try {
-        const today = new Date().toISOString().split('T')[0];
-        console.log('Loading today\'s digest for:', today);
-        
-        // Get today's digest
-        const { data: digest } = await supabase
-          .from('digests')
-          .select('emails')
-          .eq('user_id', user.id)
-          .eq('date', today)
-          .maybeSingle();
-
-        // Check if user has Gmail connection
-        const { data: profile } = await supabase
-          .from('user_profiles')
-          .select('gmail_refresh_token')
-          .eq('user_id', user.id)
-          .maybeSingle();
-
-        setHasGmailConnection(!!profile?.gmail_refresh_token);
-        const digestEmails = Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : [];
-        // Filter emails by importance threshold on client side as well
-        const filteredEmails = digestEmails.filter(email => email.importance_score >= 0.4);
-        setEmails(filteredEmails);
-        setLastUpdated(new Date());
-        
-        if (digestEmails.length > 0) {
-          console.log('Dashboard rendered with data:', digestEmails.length, 'emails');
-        }
-      } catch (error) {
-        console.error('Error loading digest:', error);
-        setEmails([]);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadTodaysDigest();
-  }, [user, digestFetchComplete]);
-
-  const handleConnectGmail = () => {
-    setShowConnectDialog(true);
-  };
-
-  const handleRefresh = async () => {
-    setIsRefreshing(true);
-    try {
-      // Ensure we have a session access token
-      if (!session?.access_token) {
-        console.warn('No session access token found for refresh');
-        toast({
-          title: "Not signed in",
-          description: "Please sign in again to refresh your digest.",
-          variant: "destructive",
-        });
-        return;
-      }
-
-      // Call initial fetch function to refresh data
-      const { error } = await supabase.functions.invoke('initial-fetch', {
-        body: { access_token: session.access_token }
-      });
-      
-      if (error) throw error;
-      
-      // Reload the digest after refresh
-      setTimeout(() => {
-        loadTodaysDigest();
-        toast({
-          title: "Refreshed",
-          description: "Your digest has been updated with the latest emails.",
-        });
-      }, 2000);
-    } catch (error) {
-      console.error('Error refreshing:', error);
-      toast({
-        title: "Refresh failed",
-        description: "Could not refresh your digest. Please try again.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsRefreshing(false);
-    }
-  };
-
-  const loadTodaysDigest = async () => {
+  const loadTodaysDigest = useCallback(async () => {
     if (!user) return;
     
     try {
@@ -159,7 +70,67 @@ export function Dashboard() {
       console.error('Error loading digest:', error);
       setEmails([]);
     }
+  }, [user?.id]);
+
+  useEffect(() => {
+    if (!user) {
+      setIsLoading(false);
+      return;
+    }
+
+    const init = async () => {
+      await loadTodaysDigest();
+      setIsLoading(false);
+    };
+
+    init();
+  }, [user, digestFetchComplete, loadTodaysDigest]);
+
+  const handleConnectGmail = () => {
+    setShowConnectDialog(true);
   };
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      // Ensure we have a session access token
+      if (!session?.access_token) {
+        console.warn('No session access token found for refresh');
+        toast({
+          title: "Not signed in",
+          description: "Please sign in again to refresh your digest.",
+          variant: "destructive",
+        });
+        return;
+      }
+
+      // Call initial fetch function to refresh data
+      const { error } = await supabase.functions.invoke('initial-fetch', {
+        body: { access_token: session.access_token }
+      });
+      
+      if (error) throw error;
+      
+      // Reload the digest after refresh
+      setTimeout(async () => {
+        await loadTodaysDigest();
+        toast({
+          title: "Refreshed",
+          description: "Your digest has been updated with the latest emails.",
+        });
+      }, 2000);
+    } catch (error) {
+      console.error('Error refreshing:', error);
+      toast({
+        title: "Refresh failed",
+        description: "Could not refresh your digest. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
 
   // Show initial fetch overlay if processing
   if (isProcessing) {
