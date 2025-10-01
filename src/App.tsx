@@ -16,6 +16,7 @@ const Dashboard = lazy(() => import("./pages/Dashboard").then(m => ({ default: m
 const History = lazy(() => import("./pages/History").then(m => ({ default: m.History })));
 const Tasks = lazy(() => import("./pages/Tasks").then(m => ({ default: m.Tasks })));
 const Settings = lazy(() => import("./pages/Settings").then(m => ({ default: m.Settings })));
+const Terms = lazy(() => import("./pages/Terms").then(m => ({ default: m.Terms })));
 const NotFound = lazy(() => import("./pages/NotFound").then(m => ({ default: m.default })));
 
 const queryClient = new QueryClient({
@@ -42,6 +43,7 @@ const AppRoutes = () => {
       {/* Public routes */}
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Home />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
+      <Route path="/terms" element={<Terms />} />
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
