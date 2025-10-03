@@ -233,6 +233,15 @@ export function Dashboard() {
           title="Your inbox is quiet today"
           description="No emails meet our importance threshold (score ≥ 0.4). Check back later or adjust your settings if you'd like to see more emails."
         />
+        <div className="text-center mt-6">
+          <Link to="/settings" className="text-primary hover:underline text-sm">
+            Adjust your settings
+          </Link>
+          <span className="text-foreground-muted mx-2">•</span>
+          <Link to="/features" className="text-primary hover:underline text-sm">
+            Learn more about InBoxt
+          </Link>
+        </div>
       </div>
     );
   }
