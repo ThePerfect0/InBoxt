@@ -1,0 +1,6 @@
+# Ensure SEO files are accessible
+/robots.txt    /robots.txt   200
+/sitemap.xml   /sitemap.xml  200
+
+# SPA routing - must be last
+/*    /index.html   200
