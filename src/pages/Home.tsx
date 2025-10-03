@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -456,7 +456,7 @@ export function Home() {
               <h4 className="font-semibold text-foreground mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
                 <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
                 <li><a href="#" className="hover:text-foreground transition-colors">GDPR</a></li>
               </ul>
             </div>
