@@ -117,19 +117,23 @@ export function Home() {
           
           {/* Top Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <Link to="/features" className="text-foreground-muted hover:text-foreground transition-colors">Features</Link>
-            <Link to="/pricing" className="text-foreground-muted hover:text-foreground transition-colors">Pricing</Link>
+            <a href="#features" className="text-foreground-muted hover:text-foreground transition-colors">Product</a>
             <a href="#faq" className="text-foreground-muted hover:text-foreground transition-colors">FAQ</a>
-            <Link to="/auth" className="text-foreground-muted hover:text-foreground transition-colors">Sign in</Link>
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-foreground-muted hover:text-foreground transition-colors"
+            >
+              Sign in
+            </button>
           </nav>
           
           {/* Mobile Menu Button */}
           <Button 
             variant="ghost" 
-            asChild
+            onClick={() => navigate('/auth')}
             className="md:hidden text-foreground-muted hover:text-foreground"
           >
-            <Link to="/auth">Sign In</Link>
+            Sign In
           </Button>
         </div>
       </header>
@@ -162,18 +166,19 @@ export function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              asChild
+              onClick={() => navigate('/auth?mode=signup')}
               className="text-lg px-8 py-4 h-auto bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
             >
-              <Link to="/auth?mode=signup">
-                <Mail className="w-5 h-5 mr-2" />
-                Get started with Google
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
+              <Mail className="w-5 h-5 mr-2" />
+              Get started with Google
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button variant="link" asChild className="text-foreground-muted hover:text-foreground text-lg">
-              <Link to="/auth">Sign in</Link>
-            </Button>
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-foreground-muted hover:text-foreground transition-colors text-lg underline-offset-4 hover:underline"
+            >
+              Sign in
+            </button>
           </div>
 
           {/* Mock Dashboard Preview */}
@@ -266,9 +271,9 @@ export function Home() {
           </div>
           
           <div className="text-center mt-8">
-            <Link to="/privacy" className="text-primary hover:underline text-sm">
+            <a href="#data-storage" className="text-primary hover:underline text-sm">
               What data we store
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -321,9 +326,9 @@ export function Home() {
           </div>
           
           <div className="mt-8">
-            <Link to="/privacy" className="text-primary hover:underline text-sm">
+            <a href="#data-storage" className="text-primary hover:underline text-sm">
               What data we store
-            </Link>
+            </a>
           </div>
         </div>
       </section>
@@ -394,18 +399,19 @@ export function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              asChild
+              onClick={() => navigate('/auth?mode=signup')}
               className="text-lg px-8 py-4 h-auto bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
             >
-              <Link to="/auth?mode=signup">
-                <Mail className="w-5 h-5 mr-2" />
-                Get started with Google
-                <ArrowRight className="w-5 h-5 ml-2" />
-              </Link>
+              <Mail className="w-5 h-5 mr-2" />
+              Get started with Google
+              <ArrowRight className="w-5 h-5 ml-2" />
             </Button>
-            <Button variant="link" asChild className="text-foreground-muted hover:text-foreground text-lg">
-              <Link to="/auth">Sign in</Link>
-            </Button>
+            <button
+              onClick={() => navigate('/auth')}
+              className="text-foreground-muted hover:text-foreground transition-colors text-lg underline-offset-4 hover:underline"
+            >
+              Sign in
+            </button>
           </div>
           
           <p className="text-sm text-foreground-muted mt-6">
@@ -431,26 +437,27 @@ export function Home() {
             <div>
               <h4 className="font-semibold text-foreground mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><Link to="/features" className="hover:text-foreground transition-colors">Features</Link></li>
-                <li><Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
-                <li><Link to="/security" className="hover:text-foreground transition-colors">Security</Link></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-foreground mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
-                <li><Link to="/status" className="hover:text-foreground transition-colors">Status</Link></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Help Center</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Status</a></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-foreground mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
                 <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
-                <li><Link to="/gdpr" className="hover:text-foreground transition-colors">GDPR</Link></li>
+                <li><a href="#" className="hover:text-foreground transition-colors">GDPR</a></li>
               </ul>
             </div>
           </div>

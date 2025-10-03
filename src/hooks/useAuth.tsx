@@ -85,11 +85,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   const signUp = async (email: string, password: string) => {
+    const redirectUrl = `${window.location.origin}/dashboard`;
+    
     const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
-        emailRedirectTo: window.location.origin
+        emailRedirectTo: redirectUrl
       }
     });
     return { error };
@@ -107,7 +109,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/dashboard`,
         scopes: 'https://www.googleapis.com/auth/gmail.readonly',
         queryParams: {
           access_type: 'offline',
@@ -122,7 +124,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'google',
       options: {
-        redirectTo: window.location.origin,
+        redirectTo: `${window.location.origin}/dashboard`,
         scopes: 'https://www.googleapis.com/auth/gmail.readonly',
         queryParams: {
           access_type: 'offline',

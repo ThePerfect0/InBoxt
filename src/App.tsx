@@ -17,13 +17,6 @@ const History = lazy(() => import("./pages/History").then(m => ({ default: m.His
 const Tasks = lazy(() => import("./pages/Tasks").then(m => ({ default: m.Tasks })));
 const Settings = lazy(() => import("./pages/Settings").then(m => ({ default: m.Settings })));
 const Terms = lazy(() => import("./pages/Terms").then(m => ({ default: m.Terms })));
-const Features = lazy(() => import("./pages/Features").then(m => ({ default: m.Features })));
-const Pricing = lazy(() => import("./pages/Pricing").then(m => ({ default: m.Pricing })));
-const Security = lazy(() => import("./pages/Security").then(m => ({ default: m.Security })));
-const Contact = lazy(() => import("./pages/Contact").then(m => ({ default: m.Contact })));
-const Status = lazy(() => import("./pages/Status").then(m => ({ default: m.Status })));
-const Privacy = lazy(() => import("./pages/Privacy").then(m => ({ default: m.Privacy })));
-const GDPR = lazy(() => import("./pages/GDPR").then(m => ({ default: m.GDPR })));
 const NotFound = lazy(() => import("./pages/NotFound").then(m => ({ default: m.default })));
 
 const queryClient = new QueryClient({
@@ -51,13 +44,6 @@ const AppRoutes = () => {
       <Route path="/" element={user ? <Navigate to="/dashboard" replace /> : <Home />} />
       <Route path="/auth" element={user ? <Navigate to="/dashboard" replace /> : <Auth />} />
       <Route path="/terms" element={<Terms />} />
-      <Route path="/features" element={<Features />} />
-      <Route path="/pricing" element={<Pricing />} />
-      <Route path="/security" element={<Security />} />
-      <Route path="/contact" element={<Contact />} />
-      <Route path="/status" element={<Status />} />
-      <Route path="/privacy" element={<Privacy />} />
-      <Route path="/gdpr" element={<GDPR />} />
       
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
