@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -251,6 +252,18 @@ export function Settings() {
               <p className="font-medium text-foreground">GDPR & CCPA compliant</p>
               <p>User-controlled data retention and deletion rights</p>
             </div>
+          </div>
+
+          <div className="pt-2 border-t border-border-subtle">
+            <Link 
+              to="/terms" 
+              className="text-sm text-primary hover:underline underline-offset-4 transition-colors inline-flex items-center"
+            >
+              View full Terms of Service
+              <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+              </svg>
+            </Link>
           </div>
         </div>
       </div>

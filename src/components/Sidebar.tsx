@@ -1,4 +1,4 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import { cn } from "@/lib/utils";
 import { 
   LayoutDashboard, 
@@ -71,6 +71,22 @@ export function Sidebar({ className }: SidebarProps) {
             </NavLink>
           ))}
         </nav>
+        
+        {/* Footer Links */}
+        <div className="px-4 pb-4 border-t border-border-subtle pt-4">
+          <div className="space-y-2 text-xs text-foreground-muted">
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <Link to="/features" className="hover:text-foreground transition-colors">Features</Link>
+              <Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link>
+              <Link to="/security" className="hover:text-foreground transition-colors">Security</Link>
+            </div>
+            <div className="flex flex-wrap gap-x-3 gap-y-1">
+              <Link to="/privacy" className="hover:text-foreground transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-foreground transition-colors">Terms</Link>
+              <Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
   );

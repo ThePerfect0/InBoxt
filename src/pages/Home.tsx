@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from '@/components/ui/accordion';
@@ -117,23 +117,19 @@ export function Home() {
           
           {/* Top Navigation */}
           <nav className="hidden md:flex items-center space-x-8">
-            <a href="#features" className="text-foreground-muted hover:text-foreground transition-colors">Product</a>
+            <Link to="/features" className="text-foreground-muted hover:text-foreground transition-colors">Features</Link>
+            <Link to="/pricing" className="text-foreground-muted hover:text-foreground transition-colors">Pricing</Link>
             <a href="#faq" className="text-foreground-muted hover:text-foreground transition-colors">FAQ</a>
-            <button
-              onClick={() => navigate('/auth')}
-              className="text-foreground-muted hover:text-foreground transition-colors"
-            >
-              Sign in
-            </button>
+            <Link to="/auth" className="text-foreground-muted hover:text-foreground transition-colors">Sign in</Link>
           </nav>
           
           {/* Mobile Menu Button */}
           <Button 
             variant="ghost" 
-            onClick={() => navigate('/auth')}
+            asChild
             className="md:hidden text-foreground-muted hover:text-foreground"
           >
-            Sign In
+            <Link to="/auth">Sign In</Link>
           </Button>
         </div>
       </header>
@@ -166,19 +162,18 @@ export function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
             <Button 
               size="lg" 
-              onClick={() => navigate('/auth?mode=signup')}
+              asChild
               className="text-lg px-8 py-4 h-auto bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
             >
-              <Mail className="w-5 h-5 mr-2" />
-              Get started with Google
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Link to="/auth?mode=signup">
+                <Mail className="w-5 h-5 mr-2" />
+                Get started with Google
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
             </Button>
-            <button
-              onClick={() => navigate('/auth')}
-              className="text-foreground-muted hover:text-foreground transition-colors text-lg underline-offset-4 hover:underline"
-            >
-              Sign in
-            </button>
+            <Button variant="link" asChild className="text-foreground-muted hover:text-foreground text-lg">
+              <Link to="/auth">Sign in</Link>
+            </Button>
           </div>
 
           {/* Mock Dashboard Preview */}
@@ -271,9 +266,9 @@ export function Home() {
           </div>
           
           <div className="text-center mt-8">
-            <a href="#data-storage" className="text-primary hover:underline text-sm">
+            <Link to="/privacy" className="text-primary hover:underline text-sm">
               What data we store
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -326,9 +321,9 @@ export function Home() {
           </div>
           
           <div className="mt-8">
-            <a href="#data-storage" className="text-primary hover:underline text-sm">
+            <Link to="/privacy" className="text-primary hover:underline text-sm">
               What data we store
-            </a>
+            </Link>
           </div>
         </div>
       </section>
@@ -399,19 +394,18 @@ export function Home() {
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
             <Button 
               size="lg" 
-              onClick={() => navigate('/auth?mode=signup')}
+              asChild
               className="text-lg px-8 py-4 h-auto bg-primary hover:bg-primary-hover text-primary-foreground font-semibold"
             >
-              <Mail className="w-5 h-5 mr-2" />
-              Get started with Google
-              <ArrowRight className="w-5 h-5 ml-2" />
+              <Link to="/auth?mode=signup">
+                <Mail className="w-5 h-5 mr-2" />
+                Get started with Google
+                <ArrowRight className="w-5 h-5 ml-2" />
+              </Link>
             </Button>
-            <button
-              onClick={() => navigate('/auth')}
-              className="text-foreground-muted hover:text-foreground transition-colors text-lg underline-offset-4 hover:underline"
-            >
-              Sign in
-            </button>
+            <Button variant="link" asChild className="text-foreground-muted hover:text-foreground text-lg">
+              <Link to="/auth">Sign in</Link>
+            </Button>
           </div>
           
           <p className="text-sm text-foreground-muted mt-6">
@@ -437,27 +431,26 @@ export function Home() {
             <div>
               <h4 className="font-semibold text-foreground mb-4">Product</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><a href="#" className="hover:text-foreground transition-colors">Features</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Pricing</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Security</a></li>
+                <li><Link to="/features" className="hover:text-foreground transition-colors">Features</Link></li>
+                <li><Link to="/pricing" className="hover:text-foreground transition-colors">Pricing</Link></li>
+                <li><Link to="/security" className="hover:text-foreground transition-colors">Security</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-foreground mb-4">Support</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><a href="#" className="hover:text-foreground transition-colors">Help Center</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Contact</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Status</a></li>
+                <li><Link to="/contact" className="hover:text-foreground transition-colors">Contact</Link></li>
+                <li><Link to="/status" className="hover:text-foreground transition-colors">Status</Link></li>
               </ul>
             </div>
             
             <div>
               <h4 className="font-semibold text-foreground mb-4">Legal</h4>
               <ul className="space-y-2 text-sm text-foreground-muted">
-                <li><a href="#" className="hover:text-foreground transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">Terms of Service</a></li>
-                <li><a href="#" className="hover:text-foreground transition-colors">GDPR</a></li>
+                <li><Link to="/privacy" className="hover:text-foreground transition-colors">Privacy Policy</Link></li>
+                <li><Link to="/terms" className="hover:text-foreground transition-colors">Terms of Service</Link></li>
+                <li><Link to="/gdpr" className="hover:text-foreground transition-colors">GDPR</Link></li>
               </ul>
             </div>
           </div>

@@ -308,11 +308,14 @@ export function Auth() {
               </button>
             </div>
             
-            {/* Privacy link */}
-            <div className="text-center">
-              <a href="#privacy" className="text-xs text-foreground-muted hover:text-foreground underline-offset-4 hover:underline transition-colors">
+            {/* Privacy and Terms links */}
+            <div className="text-center space-y-2">
+              <a href="#privacy" className="text-xs text-foreground-muted hover:text-foreground underline-offset-4 hover:underline transition-colors block">
                 How we protect your data
               </a>
+              <Link to="/terms" className="text-xs text-foreground-muted hover:text-foreground underline-offset-4 hover:underline transition-colors block">
+                Terms of Service
+              </Link>
             </div>
           </CardContent>
         </Card>
