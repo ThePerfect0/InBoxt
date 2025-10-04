@@ -6,47 +6,47 @@
 
 @layer base {
   :root {
-    /* InBoxt Dark Theme Colors (HSL) */
-    --background: 218 11% 10%;          /* #1A1B1E */
-    --surface: 217 9% 14%;              /* #242529 */
-    --surface-elevated: 216 8% 18%;     /* #2C2D31 */
-    --foreground: 218 14% 93%;          /* #EDEEF0 */
-    --foreground-muted: 220 4% 64%;     /* #A1A3A8 */
+    /* InBoxt Brand Colors - Dark Mode First */
+    --background: 0 0% 7%;              /* Deep Charcoal #121212 */
+    --surface: 0 0% 11%;                /* #1C1C1C */
+    --surface-elevated: 0 0% 15%;       /* #262626 */
+    --foreground: 0 0% 100%;            /* White #FFFFFF */
+    --foreground-muted: 0 0% 69%;       /* Light Gray #B0B0B0 */
     
-    --primary: 212 69% 57%;             /* #4A90E2 */
-    --primary-hover: 212 65% 50%;       /* #357ABD */
+    --primary: 217 91% 60%;             /* Brand Blue #3B82F6 */
+    --primary-hover: 217 91% 70%;       /* Lighter Blue Glow */
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 217 9% 14%;
-    --secondary-foreground: 218 14% 93%;
-    --secondary-hover: 216 8% 18%;
+    --secondary: 189 100% 42%;          /* Cyan Accent #00B8D9 */
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 189 100% 50%;
     
-    --border: 218 12% 24%;              /* #3A3B3F */
-    --border-subtle: 218 10% 20%;
-    --input: 217 9% 14%;
+    --border: 0 0% 20%;                 /* #333333 */
+    --border-subtle: 0 0% 16%;          /* #292929 */
+    --input: 0 0% 11%;                  /* #1C1C1C */
     
-    --success: 122 39% 49%;             /* #4CAF50 */
-    --warning: 45 100% 51%;             /* #FFC107 */
-    --danger: 4 90% 58%;                /* #F44336 */
+    --success: 142 71% 45%;             /* #22C55E */
+    --warning: 38 92% 50%;              /* #F59E0B */
+    --danger: 0 72% 51%;                /* #EF4444 */
     
-    --accent: 212 69% 57%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     
-    --muted: 217 9% 14%;
-    --muted-foreground: 220 4% 64%;
+    --muted: 0 0% 17%;                  /* #2A2A2A */
+    --muted-foreground: 0 0% 69%;       /* #B0B0B0 */
     
-    --card: 217 9% 14%;
-    --card-foreground: 218 14% 93%;
-    --card-hover: 216 8% 18%;
+    --card: 0 0% 11%;                   /* Charcoal #1C1C1C */
+    --card-foreground: 0 0% 100%;
+    --card-hover: 0 0% 15%;
     
-    --popover: 216 8% 18%;
-    --popover-foreground: 218 14% 93%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 100%;
     
-    --destructive: 4 90% 58%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     
-    --ring: 212 69% 57%;
-    --radius: 0.75rem;
+    --ring: 217 91% 60%;
+    --radius: 0.75rem;                  /* 12px rounded corners */
     
     /* Shadows */
     --shadow-sm: 0 1px 2px 0 hsl(0 0% 0% / 0.15);
@@ -59,46 +59,46 @@
   }
   
   .dark {
-    /* Same colors as root for dark-first approach */
-    --background: 218 11% 10%;
-    --surface: 217 9% 14%;
-    --surface-elevated: 216 8% 18%;
-    --foreground: 218 14% 93%;
-    --foreground-muted: 220 4% 64%;
+    /* Mirror root for dark-first approach */
+    --background: 0 0% 7%;
+    --surface: 0 0% 11%;
+    --surface-elevated: 0 0% 15%;
+    --foreground: 0 0% 100%;
+    --foreground-muted: 0 0% 69%;
     
-    --primary: 212 69% 57%;
-    --primary-hover: 212 65% 50%;
+    --primary: 217 91% 60%;
+    --primary-hover: 217 91% 70%;
     --primary-foreground: 0 0% 100%;
     
-    --secondary: 217 9% 14%;
-    --secondary-foreground: 218 14% 93%;
-    --secondary-hover: 216 8% 18%;
+    --secondary: 189 100% 42%;
+    --secondary-foreground: 0 0% 100%;
+    --secondary-hover: 189 100% 50%;
     
-    --border: 218 12% 24%;
-    --border-subtle: 218 10% 20%;
-    --input: 217 9% 14%;
+    --border: 0 0% 20%;
+    --border-subtle: 0 0% 16%;
+    --input: 0 0% 11%;
     
-    --success: 122 39% 49%;
-    --warning: 45 100% 51%;
-    --danger: 4 90% 58%;
+    --success: 142 71% 45%;
+    --warning: 38 92% 50%;
+    --danger: 0 72% 51%;
     
-    --accent: 212 69% 57%;
+    --accent: 217 91% 60%;
     --accent-foreground: 0 0% 100%;
     
-    --muted: 217 9% 14%;
-    --muted-foreground: 220 4% 64%;
+    --muted: 0 0% 17%;
+    --muted-foreground: 0 0% 69%;
     
-    --card: 217 9% 14%;
-    --card-foreground: 218 14% 93%;
-    --card-hover: 216 8% 18%;
+    --card: 0 0% 11%;
+    --card-foreground: 0 0% 100%;
+    --card-hover: 0 0% 15%;
     
-    --popover: 216 8% 18%;
-    --popover-foreground: 218 14% 93%;
+    --popover: 0 0% 15%;
+    --popover-foreground: 0 0% 100%;
     
-    --destructive: 4 90% 58%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 100%;
     
-    --ring: 212 69% 57%;
+    --ring: 217 91% 60%;
   }
 }
 
@@ -109,6 +109,7 @@
 
   body {
     @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
     font-feature-settings: "rlig" 1, "calt" 1;
   }
   
