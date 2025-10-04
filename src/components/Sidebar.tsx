@@ -4,9 +4,9 @@ import {
   LayoutDashboard, 
   History, 
   CheckSquare, 
-  Settings,
-  Mail
+  Settings
 } from "lucide-react";
+import inboxtLogo from "@/assets/inboxt-logo.jpeg";
 
 const navigation = [
   {
@@ -40,13 +40,15 @@ export function Sidebar({ className }: SidebarProps) {
     <div className={cn("bg-surface border-r border-border-subtle", className)}>
       <div className="flex h-full flex-col">
         {/* Logo */}
-        <div className="flex h-16 items-center px-6 border-b border-border-subtle">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Mail className="w-4 h-4 text-primary-foreground" />
-            </div>
-            <span className="text-heading-sm text-foreground">InBoxt</span>
-          </div>
+        <div className="flex h-16 items-center justify-center px-6 border-b border-border-subtle">
+          <Link to="/" className="flex items-center gap-3">
+            <img 
+              src={inboxtLogo} 
+              alt="InBoxt Logo" 
+              className="w-10 h-10 object-contain"
+            />
+            <span className="text-xl font-bold text-foreground">InBoxt</span>
+          </Link>
         </div>
         
         {/* Navigation */}

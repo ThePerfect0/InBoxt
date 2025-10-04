@@ -57,8 +57,10 @@ export function Layout() {
           showMenuButton={isMobile}
         />
         
-        <main className="flex-1 p-4 md:p-6 overflow-auto">
-          <Outlet />
+        <main className="flex-1 p-4 sm:p-6 lg:p-8 overflow-auto">
+          <div className="max-w-7xl mx-auto">
+            <Outlet />
+          </div>
         </main>
         
         <footer className="border-t border-border-subtle p-6">
