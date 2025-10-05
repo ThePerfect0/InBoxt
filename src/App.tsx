@@ -13,7 +13,6 @@ import { Skeleton } from "@/components/ui/skeleton";
 const Home = lazy(() => import("./pages/Home").then(m => ({ default: m.Home })));
 const Auth = lazy(() => import("./pages/Auth").then(m => ({ default: m.Auth })));
 const Dashboard = lazy(() => import("./pages/Dashboard").then(m => ({ default: m.Dashboard })));
-const Chat = lazy(() => import("./pages/Chat").then(m => ({ default: m.Chat })));
 const History = lazy(() => import("./pages/History").then(m => ({ default: m.History })));
 const Tasks = lazy(() => import("./pages/Tasks").then(m => ({ default: m.Tasks })));
 const Settings = lazy(() => import("./pages/Settings").then(m => ({ default: m.Settings })));
@@ -63,7 +62,6 @@ const AppRoutes = () => {
       {/* Protected routes */}
       <Route path="/" element={<ProtectedRoute><Layout /></ProtectedRoute>}>
         <Route path="dashboard" element={<Dashboard />} />
-        <Route path="chat" element={<Chat />} />
         <Route path="history" element={<History />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="settings" element={<Settings />} />

@@ -4,8 +4,7 @@ import {
   LayoutDashboard, 
   History, 
   CheckSquare, 
-  Settings,
-  MessageSquare
+  Settings
 } from "lucide-react";
 import inboxtLogo from "@/assets/inboxt-logo.jpeg";
 
@@ -14,11 +13,6 @@ const navigation = [
     name: "Dashboard",
     href: "/dashboard",
     icon: LayoutDashboard,
-  },
-  {
-    name: "Chat", 
-    href: "/chat",
-    icon: MessageSquare,
   },
   {
     name: "History", 
