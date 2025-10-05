@@ -94,14 +94,12 @@ serve(async (req) => {
 
     const topN = userData?.prefs_top_n || 5;
 
-    // Get Gmail tokens from user profile
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('gmail_access_token, gmail_refresh_token')
-      .eq('user_id', user.id)
+    // Get Gmail credentials from secure private schema
+    const { data: credentials } = await supabase
+      .rpc('get_gmail_credentials', { p_user_id: user.id })
       .maybeSingle();
 
-    if (!profile?.gmail_refresh_token && !profile?.gmail_access_token) {
+    if (!credentials?.refresh_token && !credentials?.access_token) {
       return new Response(JSON.stringify({
         success: false,
         error: 'Gmail not connected'
@@ -122,19 +120,19 @@ serve(async (req) => {
     try {
       // Fetch emails from Gmail
       console.log('Fetching emails from Gmail...');
-      let accessToken = profile.gmail_access_token;
+      let accessToken = credentials.access_token;
       let gmailEmails;
       try {
         gmailEmails = await fetchGmailEmails(accessToken);
       } catch (err) {
         console.warn('Initial Gmail fetch failed, attempting token refresh...', err);
-        if (profile.gmail_refresh_token) {
-          const newAccess = await refreshGmailToken(profile.gmail_refresh_token);
+        if (credentials.refresh_token) {
+          const newAccess = await refreshGmailToken(credentials.refresh_token);
           if (newAccess) {
             accessToken = newAccess;
-            // Persist new access token
+            // Persist new access token in private schema
             await supabase
-              .from('user_profiles')
+              .from('gmail_credentials')
               .update({ gmail_access_token: newAccess })
               .eq('user_id', user.id);
             // Retry fetch

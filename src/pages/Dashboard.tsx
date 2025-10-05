@@ -54,14 +54,14 @@ export function Dashboard() {
         .eq('date', today)
         .maybeSingle();
 
-      // Check if user has Gmail connection
+      // Check if user has Gmail connection by checking if profile exists
       const { data: profile } = await supabase
         .from('user_profiles')
-        .select('gmail_refresh_token')
+        .select('user_id')
         .eq('user_id', user.id)
         .maybeSingle();
 
-      setHasGmailConnection(!!profile?.gmail_refresh_token);
+      setHasGmailConnection(!!profile);
       const digestEmails = Array.isArray(digest?.emails) ? (digest.emails as unknown as EmailDigest[]) : [];
       const filteredEmails = digestEmails.filter(email => email.importance_score >= 0.4);
       setEmails(filteredEmails);

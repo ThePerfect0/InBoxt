@@ -228,33 +228,31 @@ async function fetchUserGmailEmails(supabase: any, user: User) {
   console.log(`Fetching Gmail emails for ${user.email}`);
   
   try {
-    // Get stored OAuth tokens from user profile
-    const { data: profile } = await supabase
-      .from('user_profiles')
-      .select('gmail_access_token, gmail_refresh_token')
-      .eq('user_id', user.id)
-      .single();
+    // Get stored OAuth tokens from secure private schema
+    const { data: credentials } = await supabase
+      .rpc('get_gmail_credentials', { p_user_id: user.id })
+      .maybeSingle();
 
-    if (!profile?.gmail_refresh_token) {
+    if (!credentials?.refresh_token) {
       console.log(`No Gmail tokens found for ${user.email}`);
       return [];
     }
 
-    let accessToken = profile.gmail_access_token;
+    let accessToken = credentials.access_token;
     
     // Refresh token if needed
     if (!accessToken) {
       console.log('Refreshing Gmail access token...');
-      accessToken = await refreshGmailToken(profile.gmail_refresh_token);
+      accessToken = await refreshGmailToken(credentials.refresh_token);
       
       if (!accessToken) {
         console.error('Failed to refresh Gmail token');
         return [];
       }
 
-      // Update stored access token
+      // Update stored access token in private schema
       await supabase
-        .from('user_profiles')
+        .from('gmail_credentials')
         .update({ gmail_access_token: accessToken })
         .eq('user_id', user.id);
     }
