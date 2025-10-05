@@ -36,13 +36,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         setUser(session?.user ?? null);
         setLoading(false);
         
-        // Handle OAuth token storage and user profile creation
+        // Handle user profile creation
         if (event === 'SIGNED_IN' && session?.user) {
           // Use setTimeout to defer Supabase calls and prevent deadlock
           setTimeout(() => {
             const handleSignIn = async () => {
               try {
                 // Ensure user profile exists
+                // OAuth tokens are automatically stored in private.gmail_credentials via database trigger
                 await supabase
                   .from('user_profiles')
                   .upsert({
@@ -50,19 +51,6 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
                   }, {
                     onConflict: 'user_id'
                   });
-
-                // Store OAuth tokens if available
-                if (session.provider_token) {
-                  await supabase
-                    .from('user_profiles')
-                    .upsert({
-                      user_id: session.user.id,
-                      gmail_access_token: session.provider_token,
-                      gmail_refresh_token: session.provider_refresh_token || null,
-                    }, {
-                      onConflict: 'user_id'
-                    });
-                }
               } catch (err) {
                 console.error('Error handling sign in:', err);
               }

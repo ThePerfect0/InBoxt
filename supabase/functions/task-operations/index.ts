@@ -100,12 +100,54 @@ async function createTask(supabase: any, userId: string, request: CreateTaskRequ
     });
   }
 
-  // Validate deadline format if provided
-  if (deadline && !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
-    return new Response(JSON.stringify({ error: 'Invalid deadline format. Use YYYY-MM-DD' }), {
+  // Validate title length
+  if (title.length > 500) {
+    return new Response(JSON.stringify({ error: 'Title must be less than 500 characters' }), {
       status: 400,
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
+  }
+
+  // Validate description length if provided
+  if (description && description.length > 5000) {
+    return new Response(JSON.stringify({ error: 'Description must be less than 5000 characters' }), {
+      status: 400,
+      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+    });
+  }
+
+  // Validate email_link is a valid URL if provided
+  if (email_link) {
+    try {
+      const url = new URL(email_link);
+      if (!['http:', 'https:'].includes(url.protocol)) {
+        throw new Error('Invalid protocol');
+      }
+    } catch (e) {
+      return new Response(JSON.stringify({ error: 'Invalid email link URL' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+  }
+
+  // Validate deadline format and date validity if provided
+  if (deadline) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+      return new Response(JSON.stringify({ error: 'Invalid deadline format. Use YYYY-MM-DD' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Validate that it's a valid date
+    const dateObj = new Date(deadline);
+    if (isNaN(dateObj.getTime())) {
+      return new Response(JSON.stringify({ error: 'Invalid deadline date' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   console.log(`Creating task for user ${userId}: ${title}`);
@@ -152,12 +194,23 @@ async function updateTask(supabase: any, userId: string, request: UpdateTaskRequ
     });
   }
 
-  // Validate deadline format if provided
-  if (deadline && !/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
-    return new Response(JSON.stringify({ error: 'Invalid deadline format. Use YYYY-MM-DD' }), {
-      status: 400,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+  // Validate deadline format and date validity if provided
+  if (deadline) {
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(deadline)) {
+      return new Response(JSON.stringify({ error: 'Invalid deadline format. Use YYYY-MM-DD' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Validate that it's a valid date
+    const dateObj = new Date(deadline);
+    if (isNaN(dateObj.getTime())) {
+      return new Response(JSON.stringify({ error: 'Invalid deadline date' }), {
+        status: 400,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
   }
 
   // Validate status if provided
