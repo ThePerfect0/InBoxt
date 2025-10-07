@@ -202,7 +202,17 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_gmail_credentials: {
+        Args: { p_user_id: string }
+        Returns: {
+          access_token: string
+          refresh_token: string
+        }[]
+      }
+      update_gmail_access_token: {
+        Args: { p_access_token: string; p_user_id: string }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never

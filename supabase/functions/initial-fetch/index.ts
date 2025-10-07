@@ -130,11 +130,11 @@ serve(async (req) => {
           const newAccess = await refreshGmailToken(credentials.refresh_token);
           if (newAccess) {
             accessToken = newAccess;
-            // Persist new access token in private schema
-            await supabase
-              .from('gmail_credentials')
-              .update({ gmail_access_token: newAccess })
-              .eq('user_id', user.id);
+            // Persist new access token in private schema using RPC
+            await supabase.rpc('update_gmail_access_token', { 
+              p_user_id: user.id, 
+              p_access_token: newAccess 
+            });
             // Retry fetch
             gmailEmails = await fetchGmailEmails(accessToken);
           } else {
