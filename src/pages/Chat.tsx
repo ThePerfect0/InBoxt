@@ -175,15 +175,15 @@ export const Chat = () => {
   };
 
   return (
-    <div className="flex flex-col h-[calc(100vh-4rem)]">
+    <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between p-4 border-b border-border-subtle bg-surface">
+      <div className="flex items-center justify-between">
         <div className="flex items-center gap-3">
-          <MessageSquare className="h-6 w-6 text-primary" />
-          <div>
-            <h1 className="text-2xl font-bold text-foreground">AI Chat Assistant</h1>
-            <p className="text-sm text-foreground-muted">Ask about your emails and tasks</p>
-          </div>
+          <MessageSquare className="w-5 h-5 text-foreground-muted" />
+          <h2 className="text-heading-sm text-foreground">AI Chat Assistant</h2>
+          <span className="text-body-sm text-foreground-muted">
+            Ask about your emails and tasks
+          </span>
         </div>
         {messages.length > 0 && (
           <Button
@@ -198,80 +198,83 @@ export const Chat = () => {
         )}
       </div>
 
-      {/* Messages */}
-      <ScrollArea className="flex-1 p-4" ref={scrollAreaRef}>
-        <div className="max-w-3xl mx-auto space-y-4">
-          {messages.length === 0 ? (
-            <div className="text-center py-12">
-              <MessageSquare className="h-12 w-12 mx-auto text-foreground-muted mb-4" />
-              <h3 className="text-lg font-medium text-foreground mb-2">
-                Start a conversation
-              </h3>
-              <p className="text-sm text-foreground-muted">
-                Ask me anything about your emails, tasks, or email management
-              </p>
-            </div>
-          ) : (
-            messages.map((msg) => (
-              <div
-                key={msg.id}
-                className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
+      {/* Chat Container */}
+      <div className="bg-card border border-border-subtle rounded-lg overflow-hidden flex flex-col h-[calc(100vh-16rem)]">
+        {/* Messages */}
+        <ScrollArea className="flex-1 p-6" ref={scrollAreaRef}>
+          <div className="space-y-4">
+            {messages.length === 0 ? (
+              <div className="text-center py-12">
+                <MessageSquare className="h-12 w-12 mx-auto text-foreground-muted mb-4" />
+                <h3 className="text-lg font-medium text-foreground mb-2">
+                  Start a conversation
+                </h3>
+                <p className="text-sm text-foreground-muted">
+                  Ask me anything about your emails, tasks, or email management
+                </p>
+              </div>
+            ) : (
+              messages.map((msg) => (
                 <div
-                  className={`max-w-[80%] rounded-lg px-4 py-2.5 ${
-                    msg.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-card text-card-foreground border border-border-subtle'
-                  }`}
+                  key={msg.id}
+                  className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                 >
-                  <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
-                  <p
-                    className={`text-xs mt-1 ${
+                  <div
+                    className={`max-w-[80%] rounded-lg px-4 py-2.5 ${
                       msg.role === 'user'
-                        ? 'text-primary-foreground/70'
-                        : 'text-foreground-muted'
+                        ? 'bg-primary text-primary-foreground'
+                        : 'bg-surface text-card-foreground border border-border-subtle'
                     }`}
                   >
-                    {format(new Date(msg.created_at), 'h:mm a')}
-                  </p>
+                    <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
+                    <p
+                      className={`text-xs mt-1 ${
+                        msg.role === 'user'
+                          ? 'text-primary-foreground/70'
+                          : 'text-foreground-muted'
+                      }`}
+                    >
+                      {format(new Date(msg.created_at), 'h:mm a')}
+                    </p>
+                  </div>
+                </div>
+              ))
+            )}
+            {isLoading && (
+              <div className="flex justify-start">
+                <div className="bg-surface text-card-foreground border border-border-subtle rounded-lg px-4 py-2.5">
+                  <Loader2 className="h-4 w-4 animate-spin" />
                 </div>
               </div>
-            ))
-          )}
-          {isLoading && (
-            <div className="flex justify-start">
-              <div className="bg-card text-card-foreground border border-border-subtle rounded-lg px-4 py-2.5">
-                <Loader2 className="h-4 w-4 animate-spin" />
-              </div>
-            </div>
-          )}
-          <div ref={messagesEndRef} />
-        </div>
-      </ScrollArea>
-
-      {/* Input */}
-      <div className="p-4 border-t border-border-subtle bg-surface">
-        <div className="max-w-3xl mx-auto flex gap-2">
-          <Input
-            value={inputMessage}
-            onChange={(e) => setInputMessage(e.target.value)}
-            onKeyPress={handleKeyPress}
-            placeholder="Ask me about your emails..."
-            disabled={isLoading}
-            className="flex-1 min-h-[44px]"
-          />
-          <Button
-            onClick={handleSend}
-            disabled={!inputMessage.trim() || isLoading}
-            size="icon"
-            className="min-h-[44px] min-w-[44px]"
-          >
-            {isLoading ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Send className="h-4 w-4" />
             )}
-          </Button>
+            <div ref={messagesEndRef} />
+          </div>
+        </ScrollArea>
+
+        {/* Input */}
+        <div className="p-4 border-t border-border-subtle bg-surface">
+          <div className="flex gap-2">
+            <Input
+              value={inputMessage}
+              onChange={(e) => setInputMessage(e.target.value)}
+              onKeyPress={handleKeyPress}
+              placeholder="Ask me about your emails..."
+              disabled={isLoading}
+              className="flex-1 min-h-[44px]"
+            />
+            <Button
+              onClick={handleSend}
+              disabled={!inputMessage.trim() || isLoading}
+              size="icon"
+              className="min-h-[44px] min-w-[44px]"
+            >
+              {isLoading ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Send className="h-4 w-4" />
+              )}
+            </Button>
+          </div>
         </div>
       </div>
     </div>
