@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback } from "react";
 import { SectionHeader } from "@/components/SectionHeader";
 import { EmailCard } from "@/components/EmailCard";
 import { EmptyState } from "@/components/EmptyState";
+import { PricingButton } from "@/components/PricingButton";
 import { useAuth } from "@/hooks/useAuth";
 import { useInitialFetch } from "@/hooks/useInitialFetch";
 import { InitialFetchOverlay } from "@/components/InitialFetchOverlay";
@@ -248,6 +249,8 @@ export function Dashboard() {
 
   return (
     <div className="space-y-6">
+      {/* Pricing Banner */}
+      <PricingButton variant="banner" />
       {/* Enhanced Header with Stats and Refresh */}
       <div className="bg-card border border-border-subtle rounded-lg p-6">
         <div className="flex items-center justify-between mb-4">

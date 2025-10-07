@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { PricingButton } from "@/components/PricingButton";
 import { Clock, Mail, Shield, Save, Check, Loader2 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 import { useAuth } from "@/hooks/useAuth";
@@ -103,6 +104,8 @@ export function Settings() {
 
   return (
     <div className="max-w-2xl space-y-8">
+      {/* Pricing Banner */}
+      <PricingButton variant="banner" />
       {/* Email Processing Settings */}
       <div className="bg-card border border-border-subtle rounded-lg p-6">
         <div className="flex items-center gap-3 mb-4">
