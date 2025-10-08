@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { ArrowLeft, Check } from "lucide-react";
 import { Link } from "react-router-dom";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 export function Pricing() {
   const plans = [
@@ -68,7 +69,11 @@ export function Pricing() {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="border-b border-border-subtle bg-surface/50 backdrop-blur-sm sticky top-0 z-10">
-        <div className="container mx-auto max-w-6xl px-4 py-4">
+        <div className="container mx-auto max-w-6xl px-4 py-4 flex items-center justify-between">
+          <Link to="/" className="flex items-center gap-2">
+            <img src={inboxtLogo} alt="InBoxt" className="w-8 h-8" />
+            <span className="font-semibold text-foreground">InBoxt</span>
+          </Link>
           <Link to="/">
             <Button variant="ghost" size="sm">
               <ArrowLeft className="w-4 h-4 mr-2" />

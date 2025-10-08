@@ -12,6 +12,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useNavigate } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 interface TopBarProps {
   title: string;
@@ -58,6 +59,7 @@ export function TopBar({ title, onMenuClick, showMenuButton = false }: TopBarPro
           </Button>
         )}
         
+        <img src={inboxtLogo} alt="InBoxt" className="w-6 h-6 mr-2" />
         <h1 className="text-heading-md text-foreground">{title}</h1>
       </div>
       

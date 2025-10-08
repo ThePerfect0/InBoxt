@@ -10,6 +10,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { useToast } from "@/hooks/use-toast";
 import { ConnectEmailDialog } from "@/components/ConnectEmailDialog";
 import { Link } from "react-router-dom";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 export function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -160,9 +161,7 @@ export function Auth() {
           
           {/* InBoxt Logo */}
           <div className="flex items-center justify-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
-              <Mail className="w-6 h-6 text-primary-foreground" />
-            </div>
+            <img src={inboxtLogo} alt="InBoxt" className="w-10 h-10" />
             <span className="text-xl font-bold">InBoxt</span>
           </div>
           
