@@ -7,7 +7,7 @@ import {
   Settings,
   MessageSquare
 } from "lucide-react";
-import inboxtLogo from "@/assets/inboxt-logo.jpeg";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 const navigation = [
   {
@@ -47,11 +47,11 @@ export function Sidebar({ className }: SidebarProps) {
       <div className="flex h-full flex-col">
         {/* Logo */}
         <div className="flex h-16 items-center justify-center px-6 border-b border-border-subtle">
-          <Link to="/" className="flex items-center gap-3">
+          <Link to="/" className="flex items-center gap-2">
             <img 
               src={inboxtLogo} 
               alt="InBoxt Logo" 
-              className="w-10 h-10 object-contain"
+              className="w-8 h-8 object-contain"
             />
             <span className="text-xl font-bold text-foreground">InBoxt</span>
           </Link>

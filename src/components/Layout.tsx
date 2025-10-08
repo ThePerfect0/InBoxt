@@ -4,6 +4,7 @@ import { Sidebar } from "./Sidebar";
 import { TopBar } from "./TopBar";
 import { MobileDrawer } from "./MobileDrawer";
 import { useIsMobile } from "@/hooks/use-mobile";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 export function Layout() {
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -109,8 +110,16 @@ export function Layout() {
                 </div>
               </div>
               
-              <div className="border-t border-border-subtle pt-4 text-center text-sm text-foreground-muted">
-                <p>© 2025 InBoxt. All rights reserved.</p>
+              <div className="border-t border-border-subtle pt-4 flex flex-col items-center gap-3">
+                <Link to="/" className="flex items-center gap-2 opacity-80 hover:opacity-100 transition-opacity">
+                  <img 
+                    src={inboxtLogo} 
+                    alt="InBoxt Logo" 
+                    className="w-6 h-6 object-contain"
+                  />
+                  <span className="text-sm font-semibold text-foreground">InBoxt</span>
+                </Link>
+                <p className="text-sm text-foreground-muted">© 2025 InBoxt. All rights reserved.</p>
               </div>
             </div>
           </footer>
