@@ -16,7 +16,7 @@ import {
   Star,
   ChevronDown
 } from 'lucide-react';
-import inboxtLogo from "@/assets/inboxt-logo.jpeg";
+import inboxtLogo from "@/assets/inboxt-logo.png";
 
 const FEATURES = [
   {
