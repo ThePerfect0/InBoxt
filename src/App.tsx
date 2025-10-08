@@ -17,6 +17,7 @@ const Chat = lazy(() => import("./pages/Chat").then(m => ({ default: m.Chat })))
 const History = lazy(() => import("./pages/History").then(m => ({ default: m.History })));
 const Tasks = lazy(() => import("./pages/Tasks").then(m => ({ default: m.Tasks })));
 const Settings = lazy(() => import("./pages/Settings").then(m => ({ default: m.Settings })));
+const Profile = lazy(() => import("./pages/Profile").then(m => ({ default: m.Profile })));
 const Terms = lazy(() => import("./pages/Terms").then(m => ({ default: m.Terms })));
 const Features = lazy(() => import("./pages/Features").then(m => ({ default: m.Features })));
 const Pricing = lazy(() => import("./pages/Pricing").then(m => ({ default: m.Pricing })));
@@ -67,6 +68,7 @@ const AppRoutes = () => {
         <Route path="history" element={<History />} />
         <Route path="tasks" element={<Tasks />} />
         <Route path="settings" element={<Settings />} />
+        <Route path="profile" element={<Profile />} />
       </Route>
       
       {/* Catch-all route */}
