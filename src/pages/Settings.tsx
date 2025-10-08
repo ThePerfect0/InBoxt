@@ -44,8 +44,11 @@ export function Settings() {
           variant: "destructive",
         });
       } else if (data) {
-        setDigestTimes([data.prefs_check_time || "08:00"]);
+        const savedTime = data.prefs_check_time || "08:00";
+        setDigestTimes([savedTime]);
         setTopCount(data.prefs_top_n || 5);
+        // Ensure frequency matches the loaded time
+        setDigestFrequency("once");
       }
     } catch (error) {
       console.error('Error loading settings:', error);
