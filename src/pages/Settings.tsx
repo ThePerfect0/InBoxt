@@ -32,7 +32,7 @@ export function Settings() {
     try {
       const { data, error } = await supabase
         .from('users')
-        .select('prefs_check_time, prefs_top_n')
+        .select('prefs_check_time, prefs_top_n, prefs_digest_frequency, prefs_digest_times')
         .eq('id', user?.id)
         .maybeSingle();
 
@@ -44,11 +44,20 @@ export function Settings() {
           variant: "destructive",
         });
       } else if (data) {
-        const savedTime = data.prefs_check_time || "08:00";
-        setDigestTimes([savedTime]);
+        // Load digest times from new field or fallback to old single time field
+        const savedTimes = Array.isArray(data.prefs_digest_times) 
+          ? data.prefs_digest_times as string[]
+          : [data.prefs_check_time || "08:00"];
+        setDigestTimes(savedTimes);
+        
+        // Load digest frequency or derive from number of times
+        const savedFrequency = (data.prefs_digest_frequency as string) || 
+          (savedTimes.length === 1 ? "once" : 
+           savedTimes.length === 2 ? "twice" :
+           savedTimes.length === 3 ? "three" : "four");
+        setDigestFrequency(savedFrequency);
+        
         setTopCount(data.prefs_top_n || 5);
-        // Ensure frequency matches the loaded time
-        setDigestFrequency("once");
       }
     } catch (error) {
       console.error('Error loading settings:', error);
@@ -66,7 +75,9 @@ export function Settings() {
       const { error } = await supabase.functions.invoke('settings-save', {
         body: {
           prefs_check_time: digestTimes[0],
-          prefs_top_n: topCount
+          prefs_top_n: topCount,
+          prefs_digest_frequency: digestFrequency,
+          prefs_digest_times: digestTimes
         }
       });
 

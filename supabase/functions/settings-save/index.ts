@@ -9,6 +9,8 @@ const corsHeaders = {
 interface SettingsUpdateRequest {
   prefs_check_time: string;
   prefs_top_n: number;
+  prefs_digest_frequency?: string;
+  prefs_digest_times?: string[];
 }
 
 serve(async (req) => {
@@ -46,7 +48,7 @@ serve(async (req) => {
       });
     }
 
-    const { prefs_check_time, prefs_top_n }: SettingsUpdateRequest = await req.json();
+    const { prefs_check_time, prefs_top_n, prefs_digest_frequency, prefs_digest_times }: SettingsUpdateRequest = await req.json();
 
     // Validate input
     if (!prefs_check_time || typeof prefs_check_time !== 'string') {
@@ -72,16 +74,27 @@ serve(async (req) => {
       });
     }
 
-    console.log(`Updating settings for user ${user.id}: check_time=${prefs_check_time}, top_n=${prefs_top_n}`);
+    console.log(`Updating settings for user ${user.id}: check_time=${prefs_check_time}, top_n=${prefs_top_n}, frequency=${prefs_digest_frequency}`);
+
+    // Build update object with all fields
+    const updateData: any = {
+      prefs_check_time,
+      prefs_top_n,
+      updated_at: new Date().toISOString()
+    };
+    
+    if (prefs_digest_frequency) {
+      updateData.prefs_digest_frequency = prefs_digest_frequency;
+    }
+    
+    if (prefs_digest_times && Array.isArray(prefs_digest_times)) {
+      updateData.prefs_digest_times = prefs_digest_times;
+    }
 
     // Update user preferences
     const { data, error } = await supabase
       .from('users')
-      .update({
-        prefs_check_time,
-        prefs_top_n,
-        updated_at: new Date().toISOString()
-      })
+      .update(updateData)
       .eq('id', user.id)
       .select()
       .single();

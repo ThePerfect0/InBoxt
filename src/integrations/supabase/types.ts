@@ -176,6 +176,8 @@ export type Database = {
           email: string
           id: string
           prefs_check_time: string | null
+          prefs_digest_frequency: string | null
+          prefs_digest_times: Json | null
           prefs_top_n: number | null
           updated_at: string | null
         }
@@ -184,6 +186,8 @@ export type Database = {
           email: string
           id: string
           prefs_check_time?: string | null
+          prefs_digest_frequency?: string | null
+          prefs_digest_times?: Json | null
           prefs_top_n?: number | null
           updated_at?: string | null
         }
@@ -192,6 +196,8 @@ export type Database = {
           email?: string
           id?: string
           prefs_check_time?: string | null
+          prefs_digest_frequency?: string | null
+          prefs_digest_times?: Json | null
           prefs_top_n?: number | null
           updated_at?: string | null
         }
