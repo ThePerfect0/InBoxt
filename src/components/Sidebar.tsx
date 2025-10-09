@@ -53,7 +53,7 @@ export function Sidebar({ className }: SidebarProps) {
               alt="InBoxt Logo" 
               className="w-8 h-8 object-contain"
             />
-            <span className="text-xl font-bold text-foreground">InBoxt</span>
+            <span className="text-xl font-bold text-foreground">InBoxt-Digest</span>
           </Link>
         </div>
         

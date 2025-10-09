@@ -33,7 +33,7 @@ export function Layout() {
       case '/settings':
         return 'Settings';
       default:
-        return 'InBoxt';
+        return 'InBoxt-Digest';
     }
   };
 
@@ -117,9 +117,9 @@ export function Layout() {
                     alt="InBoxt Logo" 
                     className="w-6 h-6 object-contain"
                   />
-                  <span className="text-sm font-semibold text-foreground">InBoxt</span>
+                  <span className="text-sm font-semibold text-foreground">InBoxt-Digest</span>
                 </Link>
-                <p className="text-sm text-foreground-muted">© 2025 InBoxt. All rights reserved.</p>
+                <p className="text-sm text-foreground-muted">© 2025 InBoxt-Digest. All rights reserved.</p>
               </div>
             </div>
           </footer>

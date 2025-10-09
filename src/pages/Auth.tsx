@@ -163,7 +163,7 @@ export function Auth() {
             <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
               <Mail className="w-6 h-6 text-primary-foreground" />
             </div>
-            <span className="text-xl font-bold">InBoxt</span>
+            <span className="text-xl font-bold">InBoxt-Digest</span>
           </div>
           
           <h1 className="text-heading-xl font-bold text-foreground mb-2">
@@ -171,7 +171,7 @@ export function Auth() {
           </h1>
           <p className="text-body text-foreground-muted">
             {isLogin 
-              ? "Sign in to your InBoxt account" 
+              ? "Sign in to your InBoxt-Digest account" 
               : "Get started with intelligent email digests"
             }
           </p>

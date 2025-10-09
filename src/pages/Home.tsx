@@ -64,7 +64,7 @@ const HOW_IT_WORKS = [
 
 const FAQ_ITEMS = [
   {
-    question: "How does InBoxt determine email importance?",
+    question: "How does InBoxt-Digest determine email importance?",
     answer: "Our AI analyzes sender relationships, content urgency, keywords, and your interaction patterns to score email importance. The system learns from your behavior to improve accuracy over time."
   },
   {
@@ -89,7 +89,7 @@ export function Home() {
     {
       name: "Sarah Chen",
       role: "Startup Founder",
-      content: "InBoxt cut my email triage time in half. I only see what matters and everything else just fades away.",
+      content: "InBoxt-Digest cut my email triage time in half. I only see what matters and everything else just fades away.",
       avatar: "SC"
     },
     {
@@ -119,7 +119,7 @@ export function Home() {
                 alt="InBoxt Logo" 
                 className="w-8 h-8 sm:w-10 sm:h-10 object-contain"
               />
-              <h1 className="text-lg sm:text-xl font-bold text-foreground">InBoxt</h1>
+              <h1 className="text-lg sm:text-xl font-bold text-foreground">InBoxt-Digest</h1>
             </Link>
             
             {/* Desktop Navigation */}
@@ -244,7 +244,7 @@ export function Home() {
               Everything you need to tame your inbox
             </h2>
             <p className="text-base sm:text-lg text-foreground-muted max-w-2xl mx-auto">
-              InBoxt focuses on what matters most, helping you stay productive without the overwhelm.
+              InBoxt-Digest focuses on what matters most, helping you stay productive without the overwhelm.
             </p>
           </div>
           
@@ -354,7 +354,7 @@ export function Home() {
           <div className="relative">
             <div className="bg-background rounded-lg p-8 border border-border-subtle max-w-2xl mx-auto">
               <blockquote className="text-lg text-foreground mb-6 italic">
-                "InBoxt cut my email triage time in half. I only see what matters and everything else just fades away. The task conversion feature is brilliant for staying organized."
+                "InBoxt-Digest cut my email triage time in half. I only see what matters and everything else just fades away. The task conversion feature is brilliant for staying organized."
               </blockquote>
               <div className="flex items-center justify-center space-x-3">
                 <div className="w-10 h-10 bg-primary rounded-full flex items-center justify-center text-primary-foreground font-semibold">
@@ -378,7 +378,7 @@ export function Home() {
               Frequently asked questions
             </h2>
             <p className="text-lg text-foreground-muted">
-              Everything you need to know about InBoxt
+              Everything you need to know about InBoxt-Digest
             </p>
           </div>
           
@@ -404,7 +404,7 @@ export function Home() {
             Ready to reclaim your inbox?
           </h2>
           <p className="text-xl text-foreground-muted mb-8 max-w-2xl mx-auto">
-            Join hundreds of professionals who've already transformed their email workflow with InBoxt.
+            Join hundreds of professionals who've already transformed their email workflow with InBoxt-Digest.
           </p>
           
           <div className="flex flex-col sm:flex-row gap-4 justify-center">
@@ -437,7 +437,7 @@ export function Home() {
             <div>
               <div className="flex items-center space-x-2 mb-4">
                 <Mail className="w-6 h-6 text-primary" />
-                <span className="font-bold text-lg">InBoxt</span>
+                <span className="font-bold text-lg">InBoxt-Digest</span>
               </div>
               <p className="text-foreground-muted text-sm">
                 Your smart butler for email management. Focus on what matters most.
@@ -472,7 +472,7 @@ export function Home() {
           </div>
           
           <div className="border-t border-border-subtle mt-8 pt-8 text-center text-sm text-foreground-muted">
-            <p>&copy; 2025 InBoxt. All rights reserved.</p>
+            <p>&copy; 2025 InBoxt-Digest. All rights reserved.</p>
           </div>
         </div>
       </footer>
